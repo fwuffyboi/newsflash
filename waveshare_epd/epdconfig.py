@@ -27,12 +27,11 @@
 # THE SOFTWARE.
 #
 
-import os
 import logging
+import os
+import subprocess
 import sys
 import time
-import subprocess
-
 from ctypes import *
 
 logger = logging.getLogger(__name__)
@@ -40,26 +39,24 @@ logger = logging.getLogger(__name__)
 
 class RaspberryPi:
     # Pin definition
-    RST_PIN  = 17
-    DC_PIN   = 25
-    CS_PIN   = 8
+    RST_PIN = 17
+    DC_PIN = 25
+    CS_PIN = 8
     BUSY_PIN = 24
-    PWR_PIN  = 18
+    PWR_PIN = 18
     MOSI_PIN = 10
     SCLK_PIN = 11
 
     def __init__(self):
         import spidev
         import gpiozero
-        
-        self.SPI = spidev.SpiDev()
-        self.GPIO_RST_PIN    = gpiozero.LED(self.RST_PIN)
-        self.GPIO_DC_PIN     = gpiozero.LED(self.DC_PIN)
-        # self.GPIO_CS_PIN     = gpiozero.LED(self.CS_PIN)
-        self.GPIO_PWR_PIN    = gpiozero.LED(self.PWR_PIN)
-        self.GPIO_BUSY_PIN   = gpiozero.Button(self.BUSY_PIN, pull_up = False)
 
-        
+        self.SPI = spidev.SpiDev()
+        self.GPIO_RST_PIN = gpiozero.LED(self.RST_PIN)
+        self.GPIO_DC_PIN = gpiozero.LED(self.DC_PIN)
+        # self.GPIO_CS_PIN     = gpiozero.LED(self.CS_PIN)
+        self.GPIO_PWR_PIN = gpiozero.LED(self.PWR_PIN)
+        self.GPIO_BUSY_PIN = gpiozero.Button(self.BUSY_PIN, pull_up=False)
 
     def digital_write(self, pin, value):
         if pin == self.RST_PIN:
@@ -115,7 +112,7 @@ class RaspberryPi:
 
     def module_init(self, cleanup=False):
         self.GPIO_PWR_PIN.on()
-        
+
         if cleanup:
             find_dirs = [
                 os.path.dirname(os.path.realpath(__file__)),
@@ -125,7 +122,7 @@ class RaspberryPi:
             self.DEV_SPI = None
             for find_dir in find_dirs:
                 val = int(os.popen('getconf LONG_BIT').read())
-                logging.debug("System is %d bit"%val)
+                logging.debug("System is %d bit" % val)
                 if val == 64:
                     so_filename = os.path.join(find_dir, 'DEV_Config_64.so')
                 else:
@@ -153,7 +150,7 @@ class RaspberryPi:
         self.GPIO_DC_PIN.off()
         self.GPIO_PWR_PIN.off()
         logger.debug("close 5V, Module enters 0 power consumption ...")
-        
+
         if cleanup:
             self.GPIO_RST_PIN.close()
             self.GPIO_DC_PIN.close()
@@ -161,17 +158,14 @@ class RaspberryPi:
             self.GPIO_PWR_PIN.close()
             self.GPIO_BUSY_PIN.close()
 
-        
-
-
 
 class JetsonNano:
     # Pin definition
-    RST_PIN  = 17
-    DC_PIN   = 25
-    CS_PIN   = 8
+    RST_PIN = 17
+    DC_PIN = 25
+    CS_PIN = 8
     BUSY_PIN = 24
-    PWR_PIN  = 18
+    PWR_PIN = 18
 
     def __init__(self):
         import ctypes
@@ -216,9 +210,9 @@ class JetsonNano:
         self.GPIO.setup(self.CS_PIN, self.GPIO.OUT)
         self.GPIO.setup(self.PWR_PIN, self.GPIO.OUT)
         self.GPIO.setup(self.BUSY_PIN, self.GPIO.IN)
-        
+
         self.GPIO.output(self.PWR_PIN, 1)
-        
+
         self.SPI.SYSFS_software_spi_begin()
         return 0
 
@@ -236,12 +230,12 @@ class JetsonNano:
 
 class SunriseX3:
     # Pin definition
-    RST_PIN  = 17
-    DC_PIN   = 25
-    CS_PIN   = 8
+    RST_PIN = 17
+    DC_PIN = 25
+    CS_PIN = 8
     BUSY_PIN = 24
-    PWR_PIN  = 18
-    Flag     = 0
+    PWR_PIN = 18
+    Flag = 0
 
     def __init__(self):
         import spidev
@@ -279,7 +273,7 @@ class SunriseX3:
             self.GPIO.setup(self.BUSY_PIN, self.GPIO.IN)
 
             self.GPIO.output(self.PWR_PIN, 1)
-        
+
             # SPI device, bus = 0, device = 0
             self.SPI.open(2, 0)
             self.SPI.max_speed_hz = 4000000
