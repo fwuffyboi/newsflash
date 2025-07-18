@@ -5,9 +5,9 @@ import requests
 
 def get_current_weather(api_key, location):
     """
-    Fetches the current weather for a given location using the Google Weather API.
+    Fetches the current weather for a given location using the Open Weather Map API.
 
-    :param api_key: Google API key.
+    :param api_key: Open Weather Map API key.
     :param location: The location for which to fetch the weather. String or dict with 'latitude' and 'longitude'.
     :return: A dictionary containing the current weather data.
     """
@@ -19,26 +19,29 @@ def get_current_weather(api_key, location):
         raise ValueError("Location is required to fetch weather data.")
 
     # Convert location to latitude and longitude if it's a string
-    if isinstance(location, str):
+    if isinstance(location, str): # if location is a string
         # lookup the location to get latitude and longitude
-        geocode_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={location}&key={api_key}"
+        geocode_url = f"https://api.openweathermap.org/geo/1.0/direct?q={location}&limit=3&appid={api_key}"
         response = requests.get(geocode_url)
         if response.status_code == 200:
             location_data = response.json()
-            if location_data['results']:
-                lat = location_data['results'][0]['geometry']['location']['lat']
-                lon = location_data['results'][0]['geometry']['location']['lng']
-                location = {'latitude': lat, 'longitude': lon}
-            else:
-                raise ValueError("Location not found.")
+            print("LOCATION_DATA: ", location_data) # todo/debug
+            try:
+                lat = location_data[0]['lat']
+                lon = location_data[0]['lon']
+            except (IndexError, KeyError):
+                raise ValueError("Location not found or invalid response from geocoding API.")
+
         else:
             raise Exception(f"Error geocoding location. Status: {response.status_code} --- Response: {response.text}")
+    else:
+        raise ValueError("Location must be a string.")
 
-    url = f"https://weather.googleapis.com/v1/currentConditions:lookup?key={api_key}&location.latitude={lat}&location.longitude={lon}"
+    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:
-        print(response.json())  # todo
+        print(response.json())  # todo/debug
         return response.json()
     else:
         raise Exception(f"Error fetching weather data. Status: {response.status_code} --- Response: {response.text}")
