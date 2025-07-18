@@ -1,5 +1,6 @@
 # Credit to Edun Rilwan // https://dev.to/emiloju/wrap-and-render-multiline-text-on-images-using-pythons-pillow-library-2ppp
-# эшли карамель (me) edited this mrow
+
+# god fucking thank you this is so much better than any of my implementations
 
 def wrap_text(text, font, max_width, draw):
     """
