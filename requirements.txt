@@ -1,0 +1,5 @@
+requests=2.32
+pillow=11.3
+bs4
+qrcode=8.2
+fastapi[standard]

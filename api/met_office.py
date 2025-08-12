@@ -1,16 +1,16 @@
 # this file has all met office api integrations in it.
 
 def get_current_weather_warnings_UKONLY():
-    # todo/fix: make this work for this region using xml parsing instead of html parsing
     """
     Scrapes potential weather warnings from the Met Office website.
 
     :return: A dictionary containing weather warning data.
     """
+    
     import requests
     from bs4 import BeautifulSoup
 
-    url = "https://weather.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/se"
+    url = "https://weather.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/se" #todo/fix: this should be uk-wide, but only supports southeast england at the moment.
     response = requests.get(url)
 
     if response.status_code != 200:

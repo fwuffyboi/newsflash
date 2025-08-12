@@ -1,34 +1,33 @@
 # Runs all logic for the application
 
 import os
-import threading
 import time
+import logging
+# Set up logging
+logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
+logFileName = f'newsflash-{logFileTime}.log'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename=logFileName, filemode='w')
 
+logging.info("NewsFlash logger started. Log file created: %s", logFileName)
+logging.info("Starting NewsFlash application...")
+
+# import fastapi
 from dotenv import load_dotenv
-from kivy.app import App
-from kivy.core.window import Window
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.screenmanager import ScreenManager
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 
-from apis.news_bbc import get_headlines_bbc_news
-from apis.open_weather_map import get_current_weather
+
+from api.news_bbc import get_headlines_bbc_news
+from api.open_weather_map import get_current_weather
 from initialization import full_initialization
-from screens.message import show_message
-from screens.bbc_news import BBCNewsScreen
-from screens.taskbar import Taskbar
-from screens.weather import current_weather_screen
 
 
 def lastmainshit():
     # Run the startup process
 
-
-
     # get_weather_forecast("", "", days=3)
     # get_current_air_quality("", "")
     # get_current_weather_warnings_UKONLY() # fix this. todo/test/fix
-
 
 
     while True:
@@ -47,21 +46,16 @@ def lastmainshit():
                          timeout=10)
         else:
             current_weather_forecast = get_current_weather(OPEN_WEATHER_API_KEY, LOCATION)
-                    # If we have a weather forecast, show it with the time and date
-                    cwc = current_weather_forecast
-                    print(cwc)
-                    current_weather_screen(timeout=10,
-                                           current_weather_conditions=cwc['weather'][0]['description'],
-                                           current_temperature_celsius=float(cwc['main']['temp']),
-                                           current_humidity_percentage=int(cwc['main']['humidity']),
-                                           UV_index=4,  # todo/fix
-                                           users_name=USERS_NAME
-                                           )
-
-
-
-# Make sure all is good to go before starting the app
-full_initialization()
+            # If we have a weather forecast, show it with the time and date
+            cwc = current_weather_forecast
+            print(cwc)
+            current_weather_screen(timeout=10,
+                                    current_weather_conditions=cwc['weather'][0]['description'],
+                                    current_temperature_celsius=float(cwc['main']['temp']),
+                                    current_humidity_percentage=int(cwc['main']['humidity']),
+                                    UV_index=4,  # todo/fix
+                                    users_name=USERS_NAME
+                                    )
 
 # Load environment variables from .env file
 load_dotenv()
@@ -72,36 +66,53 @@ OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
 NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "uk" if not set
 
-# Global variable to store news
-news_data = []
-
-def fetch_news_periodically():
-    from apis.news_bbc import get_headlines_bbc_news
-    while True:
-        news_data["uk"] = get_headlines_bbc_news("UK")
-        news_data["world"] = get_headlines_bbc_news("WORLD")
-        time.sleep(300)  # Fetch every 5 minutes
-
-# Start the background thread
-threading.Thread(target=fetch_news_periodically(newsRegion), daemon=True).start()
-
-
-# Build the layout of the app here
-class NewsFlashApp(App):
-    def build(self):
-        Window.fullscreen = True
-        root = BoxLayout(orientation="horizontal")
-        info_bar = Taskbar(size_hint_y=0.1)
-        sm = ScreenManager()
-        sm.add_widget(BBCNewsScreen(name="BBC News", newsRegion=BBCNewsRegion,
-                                    articleTitle=BBCNewsArticleTitle,
-                                    articleDescription=BBCNewsArticleDescription,
-                                    articleURL=BBCNewsArticleURL))
-        sm.add_widget(CurrentWeatherScreen(name="second"))
-        root.add_widget(info_bar)
-        root.add_widget(sm)
-        return root
-
 
 if __name__ == "__main__":
-    NewsFlashApp().run()
+    # Start the fastapi web server
+    app = FastAPI()
+
+
+    # First, run the full initialization
+    full_initialization(logging)
+
+    # Set environment variables for the FastAPI app
+    logging.info("Loading environment variables from .env file...")
+    load_dotenv()
+
+    # Take variables from the .env file and set them here
+    LOCATION = os.getenv("LOCATION", "London, UK")  # Default to London, UK if not set
+    OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
+    USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
+    NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "uk" if not set
+
+    # Log the loaded environment variables
+    logging.info("Loaded the environment variables!")
+
+
+    logging.info("Starting the FastAPI server!")
+
+    # Then, add all the routes
+    @app.get("/")
+    async def root():
+        return HTMLResponse("<h1><i>The NewsFlash API is up and running!!</i></h1>")
+    
+    @app.get("/ping")
+    async def ping():
+        return {"ping": "pong!"}
+    
+    @app.get("/news/bbc")
+    async def get_bbc_news():
+        return get_headlines_bbc_news(NEWS_REGION)
+
+    @app.get("/weather/current")
+    async def get_current_weather():
+        if not LOCATION or not OPEN_WEATHER_API_KEY:
+            return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}
+        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION)
+    
+    @app.get("/weather/forecast")
+    async def get_weather_forecast(days: int = 3):
+        if not LOCATION or not OPEN_WEATHER_API_KEY:
+            return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}
+        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, days=days)
+    
