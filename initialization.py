@@ -6,13 +6,10 @@ def check_packages(logger):
     """
     try:
         # import logging - This is not needed here, as it is already imported in main.py
-        import fastapi
         import requests
-        import PIL
         import bs4
         import PIL
         import qrcode
-        from dotenv import load_dotenv
 
         import os
 
