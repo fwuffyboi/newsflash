@@ -19,49 +19,14 @@ from api.open_weather_map import get_current_weather, get_weather_forecast, get_
 from initialization import full_initialization
 
 
-def lastmainshit():
-    # Run the startup process
-
-    # get_weather_forecast("", "", days=3)
-    # get_current_air_quality("", "")
-    # get_current_weather_warnings_UKONLY() # fix this. todo/test/fix
-
-
-    while True:
-        # Function logic and vars here
-        uk_headlines = get_headlines_bbc_news("UK")
-        world_headlines = get_headlines_bbc_news("WORLD")
-
-        # weather_alerts = get_current_weather_warnings_UKONLY() # todo/test/fix
-
-        # Get the current weather forecast
-        current_weather_forecast = None  # Initialize to None
-        if not LOCATION or not OPEN_WEATHER_API_KEY:
-            show_message("warn",
-                         "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file. "
-                         "If you have, check its location. If that does not work, please report the error.",
-                         timeout=10)
-        else:
-            current_weather_forecast = get_current_weather(OPEN_WEATHER_API_KEY, LOCATION)
-            # If we have a weather forecast, show it with the time and date
-            cwc = current_weather_forecast
-            print(cwc)
-            current_weather_screen(timeout=10,
-                                    current_weather_conditions=cwc['weather'][0]['description'],
-                                    current_temperature_celsius=float(cwc['main']['temp']),
-                                    current_humidity_percentage=int(cwc['main']['humidity']),
-                                    UV_index=4,  # todo/fix
-                                    users_name=USERS_NAME
-                                    )
-
 # Load environment variables from .env file
 load_dotenv()
 
 # Take variables from the .env file and set them here
-LOCATION = os.getenv("LOCATION", "London, UK")  # Default to London, UK if not set
+LOCATION = os.getenv("LOCATION", "Krakow, PL")  # Default to Krakow if not set
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
-NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "uk" if not set
+NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
 
 
 def logRequest(request):
@@ -118,6 +83,7 @@ if __name__ == "__main__":
     
     @app.route("/ping/")
     async def ping():
+        # logRequest(request) # do NOT log pings, literal waste of electricity
         return {"message": "pong!"}
     
     @app.route("/logs/")
@@ -164,42 +130,32 @@ if __name__ == "__main__":
             logging.error("Latest log file not found.")
             return {"message": "Log file not found."}
     
-    @app.route("/api/v1/news/bbc/<region>/")
-    async def get_bbc_news(region):
+    @app.route("/api/v1/news/bbc/")
+    async def get_bbc_news():
         logRequest(request)
 
-        if not region or region.lower() not in ["uk", "usa", "world"]:
+        if not NEWS_REGION or NEWS_REGION.lower() not in ["uk", "usa", "world"]:
             return get_bbc_news(NEWS_REGION)  # Default to the set NEWS_REGION if no valid region is provided
         
-        return get_headlines_bbc_news(region)
+        return get_headlines_bbc_news(NEWS_REGION)
 
-    @app.route("/api/v1/weather/current/<location>/")
-    async def get_current_weather_flask(location: str = None):
+    @app.route("/api/v1/weather/current/")
+    async def get_current_weather_flask():
         logRequest(request)
-        
-        if not location:
-            # If no location is provided, use the default LOCATION from the .env file
-            logging.info("No location provided, using default LOCATION from .env file.")
-            location = LOCATION
         
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
     
         return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION)
     
-    @app.route("/api/v1/weather/forecast/<location>/")
-    async def get_weather_forecast_flask(location, days: int = 3):
+    @app.route("/api/v1/weather/forecast/")
+    async def get_weather_forecast_flask():
         logRequest(request)
-       
-        if not location:
-            # If no location is provided, use the default LOCATION from the .env file
-            logging.info("No location provided, using default LOCATION from .env file.")
-            location = LOCATION
        
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
        
-        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, days=days)
+        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION)
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():

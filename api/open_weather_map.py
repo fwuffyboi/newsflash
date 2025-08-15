@@ -37,20 +37,20 @@ def get_current_weather(api_key, location):
     else:
         raise ValueError("Location must be a string.")
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang=en&lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200: # yippee! it works :3
-        # Add a "native_name" field to the response; this is the name of the location in the local language
-        native_name = None # default to None
-        country_code = response.json()['sys']['country']
-        country_code = country_code.lower()  # convert to lowercase
+        # # Add a "native_name" field to the response; this is the name of the location in the local language
+        # native_name = None # default to None
+        # country_code = response.json()['sys']['country']
+        # country_code = country_code.lower()  # convert to lowercase
 
-        try:
-            native_name = location_data[0]['local_names'][country_code]        
-        except (IndexError, KeyError):
-            # If the native name is not found, set it to the English name
-            native_name = location_data[0]['name'] if 'name' in location_data[0] else None
+        # try:
+        #     native_name = location_data[0]['local_names'][country_code]        
+        # except (IndexError, KeyError):
+        #     # If the native name is not found, set it to the English name
+        #     native_name = location_data[0]['name'] if 'name' in location_data[0] else None
 
         weather_data = response.json()
         print("WEATHER_DATA: ", weather_data)
@@ -59,9 +59,8 @@ def get_current_weather(api_key, location):
                 "latitude": lat,
                 "longitude": lon,
                 "name": location_data[0]['name'],
-                "native_name": native_name,  # add the native name
-                "country_code": country_code
-            },
+                # "native_name": native_name,  # add the native name
+                "country_code": location_data[0]['country'].lower(),  # convert to lowercase            },
             "weather": {
                 "description": weather_data['weather'][0]['description'],
                 "temperature": weather_data['main']['temp'],
@@ -73,17 +72,17 @@ def get_current_weather(api_key, location):
                 "icon_url": f"http://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png"
             }
         }
+    }
     else:
         raise Exception(f"Error fetching weather data. Status: {response.status_code} --- Response: {response.text}")
 
 
-def get_weather_forecast(api_key, location, days=3):
+def get_weather_forecast(api_key, location):
     """
     Fetches the weather forecast for a given location using the Google Weather API.
 
     :param api_key: OpenWeatherMap API key.
     :param location: The location for which to fetch the weather forecast. String or dict with 'latitude' and 'longitude'.
-    :param days: Number of days to fetch the forecast for (default is 3).
     :return: A dictionary containing the weather forecast data.
     """
 
@@ -112,20 +111,20 @@ def get_weather_forecast(api_key, location, days=3):
     else:
         raise ValueError("Location must be a string.")
 
-    url = f"https://api.openweathermap.org/data/2.5/forecast?units=metric&lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/forecast?units=metric&lang=en&lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
         # Add a "native_name" field to the response; this is the name of the location in the local language
-        native_name = None  # default to None
-        country_code = location_data[0]['country']
-        country_code = country_code.lower()  # convert to lowercase
-        try:
-            native_name = location_data['results'][0]['local_names'][country_code]
-        except (IndexError, KeyError):
-            # If the native name is not found, set it to the English name
-            native_name = location_data['results'][0]['formatted_address'] if 'formatted_address' in location_data['results'][0] else None
-        response_data = response.json()
-        response_data['location']['native_name'] = native_name  # add the native name to the response
+        # native_name = None  # default to None
+        # country_code = location_data[0]['country']
+        # country_code = country_code.lower()  # convert to lowercase
+        # try:
+        #     native_name = location_data['results'][0]['local_names'][country_code]
+        # except (IndexError, KeyError):
+        #     # If the native name is not found, set it to the English name
+        #     native_name = location_data['results'][0]['formatted_address'] if 'formatted_address' in location_data['results'][0] else None
+        # response_data = response.json()
+        # response_data['location']['native_name'] = native_name  # add the native name to the response
         print(response.json())  # todo
         return response.json()
     else:
