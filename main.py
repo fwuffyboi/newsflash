@@ -11,7 +11,7 @@ logging.info("NewsFlash logger started. Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, request, render_template, send_from_directory
 
 from api.news_bbc import get_headlines_bbc_news
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
@@ -23,28 +23,10 @@ from initialization import full_initialization
 load_dotenv()
 
 # Take variables from the .env file and set them here
-LOCATION = os.getenv("LOCATION", "Krakow, PL")  # Default to Krakow if not set
+LOCATION = os.getenv("LOCATION", "Krakow, PL")  # Default to Kraków if not set
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
 NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
-
-
-def logRequest(request):
-    requested_url = request.url
-    if requested_url is None or requested_url == "":
-        requested_url = "Unknown URL"
-    requesting_ip = request.remote_addr
-    if requesting_ip is None or requesting_ip == "":
-        requesting_ip = "Unknown IP"
-    
-    request_method = request.method
-    if request_method is None or request_method == "":
-        request_method = "Unknown Method"
-    user_agent = request.headers.get('User-Agent', 'Unknown User Agent')
-
-    toLog = f"Request received!, method: {request_method}, URL: {requested_url}, IP: {requesting_ip}, User-Agent: {user_agent}, Time: {time.strftime('%Y-%m-%d %H:%M:%S')}"
-
-    logging.info(toLog)
 
 
 if __name__ == "__main__":
@@ -52,9 +34,9 @@ if __name__ == "__main__":
     app = Flask(__name__)
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True  # Make JSON responses pretty
     app.config['JSON_SORT_KEYS'] = False  # Do not sort keys in JSON responses
+    app.config['TEMPLATES_AUTO_RELOAD'] = True  # Automatically reload templates on change
 
-    logging.info("Starting NewsFlash's Flask API...")
-
+    logging.info("Starting the NewsFlash web server...")
 
     # First, run the full initialization
     full_initialization(logging)
@@ -64,7 +46,7 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Take variables from the .env file and set them here
-    LOCATION = os.getenv("LOCATION", "London, UK")  # Default to London, UK if not set
+    LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to London, UK if not set
     OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
     USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
     NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
@@ -76,19 +58,57 @@ if __name__ == "__main__":
     logging.info("Starting the Flask server!")
 
     # Then, add all the routes
+
+    @app.errorhandler(404)
+    def not_found_error_flask(error):
+        if request.path.startswith('/api/'):
+            return {"error": "Resource not found"}, 404
+        else:
+            try:
+                return send_from_directory('./web', '404.html'), 404
+            except Exception as e:
+                logging.error("404.html not found in the web directory: %s", e)
+                return {"message": "Error.", "error": "404 error, however the server could not find 404.html to serve."}, 404
     @app.route("/")
-    def root():
-        logRequest(request)
-        return f"Replace this with the svelte web page. oh yh get doxxed: {str(request.remote_addr)}" # This is in HTML... somehow....
-    
+    async def root():
+        return f"put docs here for api" # This is in HTML somehow
+
+    @app.route("/web/")
+    async def web_index():
+        # Serve the index.html file from the web directory
+        try:
+            return send_from_directory('web', 'index.html')
+        except Exception as e:
+            if "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." in str(
+                    e):
+                logging.error(f"Index page not found.")
+                return send_from_directory('web', '404.html'), 404
+            else:
+                logging.error(f"Error serving index page: {e}")
+                return {"message": "Error serving index page."}, 500
+
+    @app.route("/web/<path:subpath>/")
+    async def web(subpath):
+        # Serve other web pages based on the subpath
+        try:
+            return send_from_directory('web', subpath)
+        except Exception as e:
+            if "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." in str(e):
+                logging.error(f"Web page {subpath} not found.")
+                return send_from_directory('web', '404.html'), 404
+            else:
+                logging.error(f"Error serving web page {subpath}: {e}")
+                return {"message": "Error serving web page."}, 500
+
+
     @app.route("/ping/")
     async def ping():
-        # logRequest(request) # do NOT log pings, literal waste of electricity
+        # logRequest(request) # do NOT log pings, waste of electricity
         return {"message": "pong!"}
-    
+
+    # logging routes
     @app.route("/logs/")
     async def get_logs():
-        logRequest(request)
         # Find all log files in the current directory
         log_files = [f for f in os.listdir('.') if f.startswith('newsflash-') and f.endswith('.log')]
         if not log_files:
@@ -101,7 +121,6 @@ if __name__ == "__main__":
     
     @app.route("/logs/<log_file_name>/")
     async def get_log_file(log_file_name):
-        logRequest(request)
 
         # Check if the requested log file exists
         if not os.path.exists(log_file_name):
@@ -110,16 +129,13 @@ if __name__ == "__main__":
 
         # Open the requested log file and return its contents as plain text
         try:
-            with open(log_file_name, 'r') as file:
-                logs = file.readlines()
-            return logs  # Return the contents of the log file as plain text
+            return send_from_directory('.', log_file_name, mimetype='text/plain')
         except Exception as e:
             logging.error(f"Error reading log file {log_file_name}: {e}")
-            return {"message": f"Error reading log file {log_file_name}: {str(e)}"}
+            return {"message": f"Error reading log file {log_file_name}"}
     
     @app.route("/logs/latest/")
     async def get_latest_logs():
-        logRequest(request)
 
         # Open the latest log file and return the last 1000 lines as plain text
         try:
@@ -132,7 +148,6 @@ if __name__ == "__main__":
     
     @app.route("/api/v1/news/bbc/")
     async def get_bbc_news():
-        logRequest(request)
 
         if not NEWS_REGION or NEWS_REGION.lower() not in ["uk", "usa", "world"]:
             return get_bbc_news(NEWS_REGION)  # Default to the set NEWS_REGION if no valid region is provided
@@ -141,8 +156,7 @@ if __name__ == "__main__":
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
-        logRequest(request)
-        
+
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
     
@@ -150,18 +164,22 @@ if __name__ == "__main__":
     
     @app.route("/api/v1/weather/forecast/")
     async def get_weather_forecast_flask():
-        logRequest(request)
-       
+
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
        
-        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION)
+        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, logging)
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
         if not LOCATION or not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}
         
-        return get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION)
+        return get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
 
-    Flask.run(app, host="0.0.0.0", port=8080, debug=True)
+    HOST = "0.0.0.0"
+    PORT = 8080
+
+    logging.info(f"Running NewsFlash on {HOST}:{PORT}...")
+
+    Flask.run(app, HOST, PORT, debug=True)
