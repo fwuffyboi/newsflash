@@ -21,7 +21,7 @@ rootLogger.addHandler(consoleHandler)
 # logging.getLogger().addHandler(logging.StreamHandler(sys.stdout)) # this is annoying and messes with the console logging
 
 # So logs can also go to a file
-fileHandler = logging.FileHandler("{0}/{1}.log".format(logFilePath, logFileName))
+fileHandler = logging.FileHandler("{0}/{1}".format(logFilePath, logFileName))
 fileHandler.setFormatter(logFormatter)
 rootLogger.addHandler(fileHandler)
 
@@ -42,10 +42,13 @@ from initialization import full_initialization
 load_dotenv()
 
 # Take variables from the .env file and set them here
-LOCATION = os.getenv("LOCATION", "Krakow, PL")  # Default to Kraków if not set
+LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to Kraków if not set
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
 USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
 NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+SPOTIFY_ACCESS_TOKEN = os.getenv("SPOTIFY_ACCESS_TOKEN")
+SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET")
+SPOTIFY_LANGUAGE = os.getenv("SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
 
 
 if __name__ == "__main__":
@@ -82,13 +85,13 @@ if __name__ == "__main__":
     def not_found_error_flask(error):
         if request.path.startswith('/api/'):
             logging.error(error)
-            return {"error": "Resource not found"}, 404
+            return {"message": "Resource not found"}, 404
         else:
             try:
                 return send_from_directory('./web', '404.html'), 404
             except Exception as e:
                 logging.error("404.html not found in the web directory: %s", e)
-                return {"message": "Error.", "error": "404 error, however the server could not find 404.html to serve."}, 404
+                return {"message": "Error.", "error": "404 error, however the server could not find 404.html to serve."}, 500
     @app.route("/")
     async def root():
         return f"put docs here for api" # This is in HTML somehow
@@ -120,6 +123,26 @@ if __name__ == "__main__":
                 logging.error(f"Error serving web page {subpath}: {e}")
                 return {"message": "Error serving web page."}, 500
 
+    @app.route("/api/v1/spotify/now-playing/")
+    async def get_current_track_spotify():
+        """
+        Endpoint to get the current track from Spotify.
+        Requires the access token to be set in the environment variable SPOTIFY_ACCESS_TOKEN.
+        Returns the current track information in JSON format and a 200 status code.
+        If the user is not listening to anything, returns a message indicating that and a 204 status code.
+        """
+        from api.spotify import get_current_track_spotify
+
+        if not SPOTIFY_ACCESS_TOKEN:
+            return {"message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
+
+        current_track_info = get_current_track_spotify(SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
+                                                       SPOTIFY_LANGUAGE, logging)
+        if not current_track_info:
+            return {"message": "Could not retrieve current track from Spotify."}, 204
+
+        return current_track_info, 200
+
 
     @app.route("/ping/")
     async def ping():
@@ -133,11 +156,11 @@ if __name__ == "__main__":
         log_files = [f for f in os.listdir('.') if f.startswith('newsflash-') and f.endswith('.log')]
         if not log_files:
             logging.error("No log files found.")
-            return {"message": "No log files found."}
+            return {"message": "No log files found."}, 500
         # Sort log files by modification time, oldest first
         log_files.sort(key=lambda x: os.path.getmtime(x))
         # Return the list of log files as JSON
-        return {"log_files": log_files}
+        return {"log_files": log_files}, 200
     
     @app.route("/logs/<log_file_name>/")
     async def get_log_file(log_file_name):
@@ -145,14 +168,14 @@ if __name__ == "__main__":
         # Check if the requested log file exists
         if not os.path.exists(log_file_name):
             logging.error(f"Log file {log_file_name} not found.")
-            return {"message": f"Log file {log_file_name} not found."}
+            return {"message": f"Log file {log_file_name} not found."}, 404
 
         # Open the requested log file and return its contents as plain text
         try:
-            return send_from_directory('.', log_file_name, mimetype='text/plain')
+            return send_from_directory('.', log_file_name, mimetype='text/plain'), 200
         except Exception as e:
             logging.error(f"Error reading log file {log_file_name}: {e}")
-            return {"message": f"Error reading log file {log_file_name}"}
+            return {"message": f"Error reading log file {log_file_name}"}, 500
     
     @app.route("/logs/latest/")
     async def get_latest_logs():
@@ -161,24 +184,25 @@ if __name__ == "__main__":
         try:
             with open(logFileName, 'r') as file:
                 logs = file.readlines()
-            return logs[-1000:]  # Return the last 1000 lines of the log file as plain text
+            return logs[-2000:]  # Return the last 2000 lines of the log file as plain text
         except FileNotFoundError:
             logging.error("Latest log file not found.")
-            return {"message": "Log file not found."}
+            return {"message": "Log file not found."}, 500
     
     @app.route("/api/v1/news/bbc/")
     async def get_bbc_news():
-
-        if not NEWS_REGION or NEWS_REGION.lower() not in ["uk", "usa", "world"]:
-            return get_bbc_news(NEWS_REGION)  # Default to the set NEWS_REGION if no valid region is provided
-        
-        return get_headlines_bbc_news(NEWS_REGION)
+        """
+        Endpoint to get the latest BBC news headlines.
+        :return : JSON response with the latest headlines and a 200 status code.
+        """
+        # todo/implement fully
+        return get_headlines_bbc_news(NEWS_REGION), 200
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
 
         if not OPEN_WEATHER_API_KEY:
-            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
+            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
     
         return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, logging)
     
@@ -186,14 +210,14 @@ if __name__ == "__main__":
     async def get_weather_forecast_flask():
 
         if not OPEN_WEATHER_API_KEY:
-            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
+            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
        
         return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, logging)
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
         if not LOCATION or not OPEN_WEATHER_API_KEY:
-            return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}
+            return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}, 403
         
         return get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
 
