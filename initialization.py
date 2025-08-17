@@ -8,7 +8,6 @@ def check_packages(logger):
         # import logging - This is not needed here, as it is already imported in main.py
         import requests
         import bs4
-        import PIL
         import qrcode
 
         import os
