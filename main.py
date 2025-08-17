@@ -1,17 +1,36 @@
-import os
+import os, sys
 import time
 import logging
 
 # Set up logging
+rootLogger = logging.getLogger()
+
+# set log file details, these will probably become .env variables someday, sooo... TODO
 logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
 logFileName = f'newsflash-{logFileTime}.log'
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename=logFileName, filemode='w')
+logFilePath = "."
 
+# Configure the logging format
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+
+# Make it so logs can be printed to the console (helpful for debugging)
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+rootLogger.addHandler(consoleHandler)
+# logging.getLogger().addHandler(logging.StreamHandler(sys.stdout)) # this is annoying and messes with the console logging
+
+# So logs can also go to a file
+fileHandler = logging.FileHandler("{0}/{1}.log".format(logFilePath, logFileName))
+fileHandler.setFormatter(logFormatter)
+rootLogger.addHandler(fileHandler)
+
+# Initiate everything else after we have done logging
 logging.info("NewsFlash logger started. Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, send_from_directory
 
 from api.news_bbc import get_headlines_bbc_news
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
@@ -62,6 +81,7 @@ if __name__ == "__main__":
     @app.errorhandler(404)
     def not_found_error_flask(error):
         if request.path.startswith('/api/'):
+            logging.error(error)
             return {"error": "Resource not found"}, 404
         else:
             try:
@@ -160,7 +180,7 @@ if __name__ == "__main__":
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}
     
-        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION)
+        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, logging)
     
     @app.route("/api/v1/weather/forecast/")
     async def get_weather_forecast_flask():
@@ -180,6 +200,6 @@ if __name__ == "__main__":
     HOST = "0.0.0.0"
     PORT = 8080
 
-    logging.info(f"Running NewsFlash on {HOST}:{PORT}...")
+    logging.info(f"Running NewsFlash Server on {HOST}:{PORT}...")
 
     Flask.run(app, HOST, PORT, debug=True)
