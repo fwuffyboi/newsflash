@@ -37,8 +37,8 @@ def get_current_track_spotify(access_token, access_secret, spotify_language, log
                 artist_names = artists[0]['name']
 
         # Convert the QR code to a normal string so it can be returned in the response
-        qr_code = make_qr_code(track['external_urls']['spotify'])
-        qr_code = qr_code.decode('utf-8') if isinstance(qr_code, bytes) else qr_code
+        # qr_code = make_qr_code(track['external_urls']['spotify'])
+        # qr_code = qr_code.decode('utf-8') if isinstance(qr_code, bytes) else qr_code
 
         current_track_info = {
             "id": track['id'],
@@ -47,7 +47,7 @@ def get_current_track_spotify(access_token, access_secret, spotify_language, log
             "link": track['external_urls']['spotify'],
             "album": track['album']['name'],
             "cover": track['album']['images'][0]['url'],
-            "qr_code": qr_code
+            # "qr_code": qr_code
         }
 
         return current_track_info
