@@ -136,10 +136,12 @@ if __name__ == "__main__":
         if not SPOTIFY_ACCESS_TOKEN:
             return {"message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
 
-        current_track_info = get_current_track_spotify(SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
-                                                       SPOTIFY_LANGUAGE, logging)
+        current_track_info = get_current_track_spotify(
+            SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
+            SPOTIFY_LANGUAGE, logging
+        )
         if not current_track_info:
-            return {"message": "Could not retrieve current track from Spotify."}, 204
+            return {"message": "User is not listening to anything."}, 204
 
         return current_track_info, 200
 
