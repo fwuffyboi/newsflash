@@ -34,6 +34,7 @@ from flask import Flask, request, send_from_directory
 
 from api.news_bbc import get_headlines_bbc_news
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
+from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 from initialization import full_initialization
 
@@ -42,20 +43,32 @@ from initialization import full_initialization
 load_dotenv()
 
 # Take variables from the .env file and set them here
-LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to Kraków if not set
+LOCATION = os.getenv(             "LOCATION", "Krakow, Poland")  # Default to Kraków if not set
 
-OPEN_WEATHER_ENABLED = os.getenv("OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
-OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
+
+OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
+OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY")
 OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
 
-USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
 
-BBC_NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
 
-SPOTIFY_ENABLED = os.getenv("SPOTIFY_ENABLED", "false")  # Default to false if not set
-SPOTIFY_ACCESS_TOKEN = os.getenv("SPOTIFY_ACCESS_TOKEN")
+
+BBC_NEWS_REGION = os.getenv(      "NEWS_REGION", "world")  # Default to "world" if not set
+
+
+SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED", "false")  # Default to false if not set
+SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN")
 SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET")
-SPOTIFY_LANGUAGE = os.getenv("SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
+SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
+
+
+TFL_ENABLED = os.getenv(          "TFL_ENABLED", "true")
+TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
+TFL_BUSSES_ENABLED = os.getenv(   "TFL_BUSSES_ENABLED", "true")
+
+TFL_BUSSES = os.getenv(           "TFL_BUSSES", "18,25,29,140,149,243,207")
+
 
 
 if __name__ == "__main__":
@@ -156,6 +169,43 @@ if __name__ == "__main__":
 
         return current_track_info, 200
 
+    @app.route("/api/v1/transport/tfl/train-status/")
+    async def get_tfl_train_status():
+        """
+        Endpoint to get the status of all TFL (Transport for London) train lines.
+        Returns a JSON response with the status of all TFL train lines and a 200 status code.
+        """
+
+        if TFL_ENABLED or TFL_TRAINS_ENABLED == "false":
+            return {"message": "TFL train statuses are disabled."}, 200
+
+        train_status = all_train_status_tfl(logging)
+        if not train_status:
+            return {"message": "No train status data available. Please check the logs for more information."}, 204
+
+        return {"train_status": train_status}, 200
+
+
+    @app.route("/api/v1/transport/tfl/bus-status/")
+    async def get_tfl_bus_status_flask():
+        """
+        Endpoint to get the status of all TFL bus lines requested by the user in the .env file.
+        Returns a JSON response with the status of the chosen TFL bus lines.
+        :return:
+        """
+
+        if TFL_ENABLED != "true":
+            return {"message": "TFL statuses are disabled."}, 200
+
+        if TFL_BUSSES_ENABLED == "true":
+            resp = get_set_bus_statuses_tfl(TFL_BUSSES, logging)
+            if not resp:
+                return {"message": "TFL bus statuses are not available."}, 404
+
+            return resp, 200
+
+        return {"message": "TFL bus statuses are not enabled."}, 404
+
 
     @app.route("/ping/")
     async def ping():
@@ -229,6 +279,7 @@ if __name__ == "__main__":
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
+        # todo/make cleaner and separate more into functions
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
 
