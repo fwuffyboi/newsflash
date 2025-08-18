@@ -43,9 +43,16 @@ load_dotenv()
 
 # Take variables from the .env file and set them here
 LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to Kraków if not set
+
+OPEN_WEATHER_ENABLED = os.getenv("OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
 OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
+OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
+
 USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
-NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+
+BBC_NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+
+SPOTIFY_ENABLED = os.getenv("SPOTIFY_ENABLED", "false")  # Default to false if not set
 SPOTIFY_ACCESS_TOKEN = os.getenv("SPOTIFY_ACCESS_TOKEN")
 SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET")
 SPOTIFY_LANGUAGE = os.getenv("SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
@@ -71,7 +78,7 @@ if __name__ == "__main__":
     LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to London, UK if not set
     OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
     USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
-    NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+    BBC_NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
@@ -131,6 +138,10 @@ if __name__ == "__main__":
         Returns the current track information in JSON format and a 200 status code.
         If the user is not listening to anything, returns a message indicating that and a 204 status code.
         """
+
+        if not SPOTIFY_ENABLED:
+            return {"message": "Spotify integration is disabled."}, 403
+
         from api.spotify import get_current_track_spotify
 
         if not SPOTIFY_ACCESS_TOKEN:
@@ -198,7 +209,7 @@ if __name__ == "__main__":
         :return : JSON response with the latest headlines and a 200 status code.
         """
         # todo/implement fully
-        return get_headlines_bbc_news(NEWS_REGION), 200
+        return get_headlines_bbc_news(BBC_NEWS_REGION), 200
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
@@ -206,7 +217,7 @@ if __name__ == "__main__":
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
     
-        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
     
     @app.route("/api/v1/weather/forecast/")
     async def get_weather_forecast_flask():
@@ -214,15 +225,65 @@ if __name__ == "__main__":
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
        
-        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
-        if not LOCATION or not OPEN_WEATHER_API_KEY:
-            return {"error": "Please set the LOCATION and OPEN_WEATHER_API_KEY in the .env file."}, 403
-        
-        return get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        if not OPEN_WEATHER_API_KEY:
+            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
 
+        if not LOCATION:
+            return {"error": "Please provide a location or set one in the .env file."}, 403
+
+        # take the response
+        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        logging.info(f"Current Air Quality: {caq}")
+
+        # Parse the response to figure out the "air rating"
+        if caq is None:
+            return {"error": "Could not fetch air quality data. Please check the location and API key."}, 500
+
+        aqi_list = []
+        # Return a worded rating based on the aqi value
+        for i in range(len(caq['list'])): # iterate through the list of air quality stations
+            # Get the air quality index (aqi) value and add it to a list
+
+            i = i - 1
+            aqi = caq['list'][i]['main']['aqi']
+            aqi_list.append(aqi)
+
+        # Calculate the average aqi value
+        if not aqi_list:
+            return {"error": "No air quality data available."}, 500
+        average_aqi = sum(aqi_list) / len(aqi_list)
+
+        # Determine the air quality rating based on the average aqi value
+
+        # todo/translations
+        # Aktualna jakość powietrza jest = The current air quality is
+
+        if 0 < average_aqi <= 1: # if aqi is between 0 and 1
+            caq_rating = "świetna!"
+        elif 1 < average_aqi <= 2: # if aqi is between 1 and 2
+            caq_rating = "dobra"
+        elif 2 < average_aqi <= 3: # if aqi is between 2 and 3
+            caq_rating = "umiarkowana"
+        elif 3 < average_aqi <= 4: # if aqi is between 3 and 4
+            caq_rating = "niezdrowa"
+        elif 4 < average_aqi <= 5: # if aqi is between 4 and 5
+            caq_rating = "niebezpieczna"
+        else:  # if aqi is greater than 5
+            return {"error": f"Air quality index is too high (over 5). This is likely an API error. Average AQI: {average_aqi}."}, 500
+
+        return {
+            "location": LOCATION,
+            "rating": caq_rating,
+            "average_aqi": int(average_aqi),
+            "data": caq
+        }, 200
+
+
+    # Run the Flask app
     HOST = "0.0.0.0"
     PORT = 8080
 
