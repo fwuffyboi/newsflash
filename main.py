@@ -247,8 +247,6 @@ if __name__ == "__main__":
         # Return a worded rating based on the aqi value
         for i in range(len(caq['list'])): # iterate through the list of air quality stations
             # Get the air quality index (aqi) value and add it to a list
-
-            i = i - 1
             aqi = caq['list'][i]['main']['aqi']
             aqi_list.append(aqi)
 
