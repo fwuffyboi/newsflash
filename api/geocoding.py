@@ -18,9 +18,6 @@ def geocodeLocation(api_key, location, logger):
         if response.status_code == 200:
             location_data = response.json()
 
-            # Debugging output
-            print("LOCATION_DATA: ", location_data)  # todo/debug
-
             try:
                 lat = location_data[0]['lat']
                 lon = location_data[0]['lon']
