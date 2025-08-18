@@ -22,6 +22,8 @@ def get_current_track_spotify(access_token, access_secret, spotify_language, log
         logger.warn("No playback information found, user is likely not listening to anything. Playback: {}".format(playback))
         return None
 
+    logger.warn(playback)
+    logger.warn(playback.get("item"))
     if playback and playback.get('item'):
         track = playback['item']
         artists = [artist for artist in track['artists']]
@@ -47,10 +49,13 @@ def get_current_track_spotify(access_token, access_secret, spotify_language, log
             "link": track['external_urls']['spotify'],
             "album": track['album']['name'],
             "cover": track['album']['images'][0]['url'],
+            "duration_ms": track['duration_ms'],
+            "is_playing": playback['is_playing'],
+            "progress_ms": playback['progress_ms'],
             # "qr_code": qr_code
         }
 
         return current_track_info
-
-    logger.error("No current playback found or playback item is empty.")
-    return None
+    else:
+        logger.error("No current playback found or playback item is empty.")
+        return None

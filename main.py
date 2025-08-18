@@ -141,7 +141,7 @@ if __name__ == "__main__":
             SPOTIFY_LANGUAGE, logging
         )
         if not current_track_info:
-            return {"message": "User is not listening to anything."}, 204
+            return {"message": "User is not listening to anything."}, 200
 
         return current_track_info, 200
 
