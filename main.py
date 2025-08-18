@@ -263,15 +263,15 @@ if __name__ == "__main__":
         # Aktualna jakość powietrza jest = The current air quality is
 
         if 0 < average_aqi <= 1: # if aqi is between 0 and 1
-            caq_rating = "świetna!"
+            caq_rating = "Great!"
         elif 1 < average_aqi <= 2: # if aqi is between 1 and 2
-            caq_rating = "dobra"
+            caq_rating = "Good"
         elif 2 < average_aqi <= 3: # if aqi is between 2 and 3
-            caq_rating = "umiarkowana"
+            caq_rating = "Moderate"
         elif 3 < average_aqi <= 4: # if aqi is between 3 and 4
-            caq_rating = "niezdrowa"
+            caq_rating = "Unhealthy"
         elif 4 < average_aqi <= 5: # if aqi is between 4 and 5
-            caq_rating = "niebezpieczna"
+            caq_rating = "Hazardous"
         else:  # if aqi is greater than 5
             return {"error": f"Air quality index is too high (over 5). This is likely an API error. Average AQI: {average_aqi}."}, 500
 
