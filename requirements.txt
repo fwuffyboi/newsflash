@@ -1,7 +1,6 @@
 requests
 bs4
-qrcode
 flask[async]
 dotenv
 spotipy
-pillow
+ics
