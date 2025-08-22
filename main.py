@@ -2,6 +2,9 @@ import os, sys
 import time
 import logging
 
+from api.google_calendar import get_calendar_events_google
+from api.met_office import get_current_weather_warnings_UKONLY
+
 # Set up logging
 rootLogger = logging.getLogger()
 
@@ -33,7 +36,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory
 
 from api.news_bbc import get_headlines_bbc_news
-from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
+from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, rate_air_quality
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 from initialization import full_initialization
@@ -50,6 +53,7 @@ OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to
 OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY")
 OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
 
+MET_OFFICE_WEATHER_WARNING_REGION = os.getenv( "MET_OFFICE_WEATHER_WARNING_REGION", "NOTSET")
 
 USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
 
@@ -70,6 +74,9 @@ TFL_BUSSES_ENABLED = os.getenv(   "TFL_BUSSES_ENABLED", "true")
 TFL_BUSSES = os.getenv(           "TFL_BUSSES", "18,25,29,140,149,243,207")
 
 
+GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL")
+
+
 
 if __name__ == "__main__":
     # Start the fastapi web server
@@ -88,9 +95,12 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Take variables from the .env file and set them here
-    LOCATION = os.getenv("LOCATION", "Krakow, Poland")  # Default to London, UK if not set
+    LOCATION = os.getenv("LOCATION", "Krakow, Poland")
     OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
+
     USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
+    USERS_NAME = USERS_NAME.lower().title()
+
     BBC_NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
 
     # Log the loaded environment variables
@@ -98,6 +108,17 @@ if __name__ == "__main__":
 
 
     logging.info("Starting the Flask server!")
+
+    # Warnings go here for the user.
+    APPLICATION_USER_WARNINGS = []
+
+    if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
+        warning_message = ("YOU HAVE NOT SET THE MET OFFICE WEATHER WARNING LOCATION. WHILE NOT REQUIRED, "
+                           "IT MAY BE HELPFUL IN AN EMERGENCY. FOLLOW THE INSTRUCTIONS IN THE .ENV FILE TO SET YOURS. "
+                           "ALTERNATIVELY, TO REMOVE THIS WARNING, CHANGE IT TO \"NOTUK\".")
+        APPLICATION_USER_WARNINGS.append(warning_message)
+        logging.warning(warning_message)
+
 
     # Then, add all the routes
 
@@ -115,6 +136,10 @@ if __name__ == "__main__":
     @app.route("/")
     async def root():
         return f"put docs here for api" # This is in HTML somehow
+
+    @app.route("/api/warnings/")
+    async def api_warnings():
+        return APPLICATION_USER_WARNINGS
 
     @app.route("/web/")
     async def web_index():
@@ -142,6 +167,10 @@ if __name__ == "__main__":
             else:
                 logging.error(f"Error serving web page {subpath}: {e}")
                 return {"message": "Error serving web page."}, 500
+
+    @app.route("/api/v1/users-name")
+    async def api_users_name():
+        return {"name": USERS_NAME}, 200
 
     @app.route("/api/v1/spotify/now-playing/")
     async def get_current_track_spotify():
@@ -209,7 +238,6 @@ if __name__ == "__main__":
 
     @app.route("/ping/")
     async def ping():
-        # logRequest(request) # do NOT log pings, waste of electricity
         return {"message": "pong!"}
 
     # logging routes
@@ -251,7 +279,7 @@ if __name__ == "__main__":
         except FileNotFoundError:
             logging.error("Latest log file not found.")
             return {"message": "Log file not found."}, 500
-    
+
     @app.route("/api/v1/news/bbc/")
     async def get_bbc_news():
         """
@@ -277,6 +305,19 @@ if __name__ == "__main__":
        
         return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
 
+    @app.route("/api/v1/weather/warnings/")
+    async def get_weather_warnings_flask():
+        wa = get_current_weather_warnings_UKONLY(MET_OFFICE_WEATHER_WARNING_REGION, logging)
+
+        if wa == []:
+            return {"message": "No weather warnings found."}, 200 # this prevents an error that happens when its empty list.
+
+        if not wa:
+            return {"message": f"Unknown error occurred getting UK weather warnings for region {MET_OFFICE_WEATHER_WARNING_REGION}."}, 500
+
+        return wa
+
+
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
         # todo/make cleaner and separate more into functions
@@ -287,49 +328,24 @@ if __name__ == "__main__":
             return {"error": "Please provide a location or set one in the .env file."}, 403
 
         # take the response
-        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
-        logging.info(f"Current Air Quality: {caq}")
+        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, OPEN_WEATHER_LANGUAGE, LOCATION, logging)
 
-        # Parse the response to figure out the "air rating"
-        if caq is None:
-            return {"error": "Could not fetch air quality data. Please check the location and API key."}, 500
+        # No need to figure out the aqi rating here because it's done in the above function
 
-        aqi_list = []
-        # Return a worded rating based on the aqi value
-        for i in range(len(caq['list'])): # iterate through the list of air quality stations
-            # Get the air quality index (aqi) value and add it to a list
-            aqi = caq['list'][i]['main']['aqi']
-            aqi_list.append(aqi)
+        return caq, 200
 
-        # Calculate the average aqi value
-        if not aqi_list:
-            return {"error": "No air quality data available."}, 500
-        average_aqi = sum(aqi_list) / len(aqi_list)
+    @app.route("/api/v1/calendar/google")
+    async def get_google_calendar_flask():
 
-        # Determine the air quality rating based on the average aqi value
+        if GOOGLE_CALENDAR_ICS_URL == "":
+            return {"message": "This endpoint will not work because the GOOGLE_CALENDAR_ICS_URL environment variable is empty."}
 
-        # todo/translations
-        # Aktualna jakość powietrza jest = The current air quality is
+        cag = get_calendar_events_google(GOOGLE_CALENDAR_ICS_URL, logging)
 
-        if 0 < average_aqi <= 1: # if aqi is between 0 and 1
-            caq_rating = "Great!"
-        elif 1 < average_aqi <= 2: # if aqi is between 1 and 2
-            caq_rating = "Good"
-        elif 2 < average_aqi <= 3: # if aqi is between 2 and 3
-            caq_rating = "Moderate"
-        elif 3 < average_aqi <= 4: # if aqi is between 3 and 4
-            caq_rating = "Unhealthy"
-        elif 4 < average_aqi <= 5: # if aqi is between 4 and 5
-            caq_rating = "Hazardous"
-        else:  # if aqi is greater than 5
-            return {"error": f"Air quality index is too high (over 5). This is likely an API error. Average AQI: {average_aqi}."}, 500
+        if not cag:
+            return {"error": cag}, 500
 
-        return {
-            "location": LOCATION,
-            "rating": caq_rating,
-            "average_aqi": int(average_aqi),
-            "data": caq
-        }, 200
+        return cag
 
 
     # Run the Flask app
