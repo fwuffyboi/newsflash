@@ -13,50 +13,69 @@ def get_headlines_bbc_news(region: str):
         import requests
         from bs4 import BeautifulSoup
 
-        if region.lower() not in ["uk", "usc", "world"]:
-            raise ValueError("Invalid region. Currently, only 'UK', 'USC', or 'WORLD' is accepted.")
+        region = region.lower().split(",")
 
-        if region.lower() == "uk":
-            url = "https://feeds.bbci.co.uk/news/uk/rss.xml"  # BBC News UK RSS feed URL
-        elif region.lower() == "usa":
-            url = "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
-        elif region.lower() == "world":
-            url = "https://feeds.bbci.co.uk/news/world/rss.xml"
+        # To check all provided regions are acceptable/valid
+        for area in region:
+            if area not in ["uk", "usc", "world"]:
+                raise ValueError("Invalid region. Currently, only 'UK', 'USC', or 'WORLD' is accepted.")
 
-        response = requests.get(url)
-        if response.status_code != 200:
-            raise Exception(
-                f"Failed to fetch data from BBC News. Status: {response.status_code} --- Response: {response.text}")
-
-        soup = BeautifulSoup(response.content, 'xml')  # Parse the XML content
         headlines = []
 
-        # My personal word blocklist, shit i dont care about or wanna see on the daily
-        blocklist = ["rape", "abuse", "stab", "stabbing", "prince"]
+        for area in region:
+            if   area == "uk":
+                url = "https://feeds.bbci.co.uk/news/uk/rss.xml"  # BBC News UK RSS feed URL
+            elif area == "usc":
+                url = "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
+            elif area == "world":
+                url = "https://feeds.bbci.co.uk/news/world/rss.xml"
+            else:
+                raise ValueError("Invalid region. Currently, only 'UK', 'USC', or 'WORLD' is accepted.")
 
-        for item in soup.find_all('item'):
-            title = item.title.text.strip()
-            description = item.description.text.strip()
-            link = item.link.text.strip()
+            response = requests.get(url)
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed to fetch data from BBC News. Status: {response.status_code} --- Response: {response.text}")
 
-            # Check if the title or description contains any blocked words
-            if any(blocked_word.lower() in title.lower() for blocked_word in blocklist):
-                title = f"Headline contains blocked word(s)"  # If the title contains a blocked word, modify it
+            soup = BeautifulSoup(response.content, 'xml')  # Parse the XML content
 
-            if any(blocked_word.lower() in description.lower() for blocked_word in blocklist):
-                description = f"Description contains blocked word(s)"
+            # My personal word blocklist, shit I don't care about or want to see on the daily
+            blocklist = ["rape", "abuse", "stab", "stabbing", "prince"]
 
-            # Print the title to the console
-            # print(title) # todo/debug
+            # set up a temporary list to house the headlines of just this area, then late on add it all together
+            temp_lines = []
+            item_count = 0
 
-            headlines.append({'title': title, 'desc': description, 'link': link})
+            for item in soup.find_all('item'):
 
-        # Limit the number of headlines to 5
-        if len(headlines) >= 5:
-            headlines = headlines[:5]
+                # Add 1 to the item counter so we know what article we're on
+                item_count += 1
 
-        # print(headlines) # todo/debug
+                title = item.title.text.strip()
+                description = item.description.text.strip()
+                link = item.link.text.strip()
 
+                # Check if the title or description contains any blocked words
+                if any(blocked_word.lower() in title.lower() for blocked_word in blocklist):
+                    title = f"This headline contains one or more of your chosen blocked words."  # If the title contains a blocked word, modify it
+
+                if any(blocked_word.lower() in description.lower() for blocked_word in blocklist):
+                    description = f"..."
+
+                temp_lines.append({'title': title, 'desc': description, 'link': link})
+
+            if len(temp_lines) > 6:
+                temp_lines = temp_lines[:5]
+
+            print(temp_lines)
+
+            # Add the region as well as the temp_lines
+            temp_lines = {area: temp_lines}
+            headlines.append(temp_lines)
+
+        print(headlines)
+
+        # after going through every provided region, provide the final result of all headlines.
         return headlines
 
     except Exception as e:
