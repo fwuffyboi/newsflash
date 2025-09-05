@@ -1,7 +1,4 @@
-from api.qrcode import make_qr_code
-
-
-def get_current_track_spotify(access_token, access_secret, spotify_language, logger):
+def get_next_4_tracks_spotify(access_token, access_secret, spotify_language, logger):
     import spotipy
     from spotipy.oauth2 import SpotifyOAuth
 
@@ -22,40 +19,41 @@ def get_current_track_spotify(access_token, access_secret, spotify_language, log
         logger.warn("No playback information found, user is likely not listening to anything. Playback: {}".format(playback))
         return None
 
-    logger.warn(playback)
-    logger.warn(playback.get("item"))
-    if playback and playback.get('item'):
-        track = playback['item']
-        artists = [artist for artist in track['artists']]
+    def format_track(track):
+        artists = [artist['name'] for artist in track['artists']]
         if len(artists) == 2:
-            # If there are two artists, join it together with " & "
-            artist_names = ' & '.join([artist['name'] for artist in artists])
+            artist_names = ' & '.join(artists)
+        elif len(artists) > 2:
+            artist_names = ', '.join(artists[:-1]) + ' & ' + artists[-1]
         else:
-            # If there are more than two artists, join them with ", ", then join the last two with " & "
-            if len(artists) > 2:
-                artist_names = ', '.join([artist['name'] for artist in artists[:-1]]) + ' & ' + artists[-1]['name']
-            else:
-                # If there is only one artist, just return the name
-                artist_names = artists[0]['name']
+            artist_names = artists[0]
 
-        # Convert the QR code to a normal string so it can be returned in the response
-        # qr_code = make_qr_code(track['external_urls']['spotify'])
-        # qr_code = qr_code.decode('utf-8') if isinstance(qr_code, bytes) else qr_code
-
-        current_track_info = {
+        return {
             "id": track['id'],
             "track_name": track['name'],
             "artists": artist_names,
             "link": track['external_urls']['spotify'],
             "album": track['album']['name'],
             "cover": track['album']['images'][0]['url'],
-            "duration_ms": track['duration_ms'],
-            "is_playing": playback['is_playing'],
-            "progress_ms": playback['progress_ms'],
-            # "qr_code": qr_code
+            "duration_ms": track['duration_ms']
         }
 
-        return current_track_info
+    current_track_info = format_track(playback['item'])
+    current_track_info.update({
+        "is_playing": playback['is_playing'],
+        "progress_ms": playback['progress_ms'],
+        "device": playback['device']['name'],
+        "device_type": playback['device']['type']
+    })
+
+    queue_playback = sp.queue()
+    if not queue_playback:
+        logger.error("No queue playback information found.")
+        next_tracks = []
     else:
-        logger.error("No current playback found or playback item is empty.")
-        return None
+        next_tracks = [format_track(track) for track in queue_playback.get('queue', [])[:3]]
+
+    return {
+        "current_track": current_track_info,
+        "next_tracks": next_tracks
+    }
