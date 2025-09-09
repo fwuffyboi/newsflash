@@ -1,6 +1,7 @@
 import os, sys
 import time
 import logging
+from operator import truediv
 
 from api.google_calendar import get_calendar_events_google
 from api.met_office import get_current_weather_warnings_UKONLY
@@ -43,42 +44,12 @@ from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 from initialization import full_initialization
 
 
-# Load environment variables from .env file
-load_dotenv()
 
-# Take variables from the .env file and set them here
-LOCATION = os.getenv(             "LOCATION", "Krakow, Poland")  # Default to Kraków if not set
-
-MIRROR_ACTIVITY = True # Important!!!!!! This defines if the mirror should be on.
-
-OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
-OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY")
-OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
-
-MET_OFFICE_WEATHER_WARNING_REGION = os.getenv( "MET_OFFICE_WEATHER_WARNING_REGION", "NOTSET")
-
-USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
-
-BBC_NEWS_REGION = os.getenv(      "NEWS_REGION", "world")  # Default to "world" if not set
-
-SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED", "false")  # Default to false if not set
-SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN")
-SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET")
-SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
-
-
-TFL_ENABLED = os.getenv(          "TFL_ENABLED", "true")
-TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
-TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
-
-TFL_BUS_ROUTES = os.getenv(           "TFL_BUSES", "18,25,29,140,149,243,207")
-
-GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL")
 
 
 
 if __name__ == "__main__":
-    # Start the fastapi web server
+    # Start the flask web server
     app = Flask(__name__)
     CORS(app, origins=["*"]) # enable CORS on all routes.
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True  # Make JSON responses pretty
@@ -90,26 +61,41 @@ if __name__ == "__main__":
     # First, run the full initialization
     full_initialization(logging)
 
-    # Set environment variables for the FastAPI app
+    # Set environment variables for the Flask app
     logging.info("Loading environment variables from .env file...")
+    # Load environment variables from .env file
     load_dotenv()
 
     # Take variables from the .env file and set them here
-    LOCATION = os.getenv("LOCATION", "Krakow, Poland")
-    OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")
+    LOCATION = os.getenv(             "LOCATION", "Kraków, Polska")  # Default to Kraków if not set
 
-    USERS_NAME = os.getenv("USERS_NAME", "User")  # Default to "User" if not set
-    USERS_NAME = USERS_NAME.lower().title()
+    OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
+    OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY", "NOTSET")
+    OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
 
-    BBC_NEWS_REGION = os.getenv("NEWS_REGION", "world")  # Default to "world" if not set
+    MET_OFFICE_WEATHER_WARNING_REGION = os.getenv( "MET_OFFICE_WEATHER_WARNING_REGION", "NOTSET")
+
+    USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
+
+    BBC_NEWS_REGION = os.getenv(      "BBC_NEWS_REGION", "world")  # Default to "world" if not set
+
+    SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED", "false")  # Default to false if not set
+    SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN", "NOTSET")
+    SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET", "NOTSET")
+    SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
+
+    TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
+    TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
+
+    TFL_BUS_ROUTES = os.getenv(           "TFL_BUSES", "18,25,29,140,149,243,207")
+
+    GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL", "DISABLED")
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
-
-
     logging.info("Starting the Flask server!")
 
-    # Warnings go here for the user.
+    # Application warnings go here for the user.
     APPLICATION_USER_WARNINGS = []
 
     if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
@@ -143,6 +129,51 @@ if __name__ == "__main__":
     async def api_warnings():
         return APPLICATION_USER_WARNINGS
 
+    @app.route("/api/config/")
+    async def api_config():
+        if OPEN_WEATHER_ENABLED == "true":
+            owme = True
+        else:
+            owme = False
+        if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
+            moe = False
+        else:
+            moe = True
+        if BBC_NEWS_REGION == "":
+            bbce = False
+        else:
+            bbce = True
+        if SPOTIFY_ENABLED == "true":
+            se = True
+        else:
+            se = False
+        if TFL_TRAINS_ENABLED == "true":
+            tfl_t = True
+        else:
+            tfl_t = False
+        if TFL_BUSES_ENABLED == "true":
+            tfl_b = True
+        else:
+            tfl_b = False
+        if GOOGLE_CALENDAR_ICS_URL == "":
+            gcal = False
+        else:
+            gcal = True
+
+        return {
+            "user_name": USERS_NAME,
+
+            "routes": {
+                "OWM": owme,
+                "MET_OFFICE": moe,
+                "BBC_NEWS": bbce,
+                "SPOTIFY": se,
+                "TFL_TRAINS": tfl_t,
+                "TFL_BUSES": tfl_b,
+                "G_CAL": gcal
+            }
+        }
+
     @app.route("/web/")
     async def web_index():
         # Serve the index.html file from the web directory
@@ -169,17 +200,6 @@ if __name__ == "__main__":
             else:
                 logging.error(f"Error serving web page {subpath}: {e}")
                 return {"message": "Error serving web page."}, 500
-
-    @app.route("/activity/")
-    async def activity_flask():
-        """
-        This endpoint returns either true or false in json. If true, the mirror should activate and be working.
-        """
-        if MIRROR_ACTIVITY:
-            return {"activity": True}
-        else:
-            return {"activity": False}
-
 
     @app.route("/api/v1/users-name")
     async def api_users_name():
@@ -218,7 +238,7 @@ if __name__ == "__main__":
         Returns a JSON response with the status of all TFL train lines and a 200 status code.
         """
 
-        if TFL_ENABLED or TFL_TRAINS_ENABLED == "false":
+        if TFL_TRAINS_ENABLED == "false":
             return {"message": "TFL train statuses are disabled."}, 200
 
         train_status = all_train_status_tfl(logging)
@@ -235,9 +255,6 @@ if __name__ == "__main__":
         Returns a JSON response with the status of the chosen TFL bus lines.
         :return:
         """
-
-        if TFL_ENABLED != "true":
-            return {"message": "TFL statuses are disabled."}, 200
 
         if TFL_BUSES_ENABLED == "true":
             resp = get_set_bus_statuses_tfl(TFL_BUS_ROUTES, logging)
