@@ -59,9 +59,7 @@ MET_OFFICE_WEATHER_WARNING_REGION = os.getenv( "MET_OFFICE_WEATHER_WARNING_REGIO
 
 USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
 
-
 BBC_NEWS_REGION = os.getenv(      "NEWS_REGION", "world")  # Default to "world" if not set
-
 
 SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED", "false")  # Default to false if not set
 SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN")
@@ -74,7 +72,6 @@ TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
 TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
 
 TFL_BUS_ROUTES = os.getenv(           "TFL_BUSES", "18,25,29,140,149,243,207")
-
 
 GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL")
 
