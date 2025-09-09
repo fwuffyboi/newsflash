@@ -1,5 +1,6 @@
 # this file has all google api integrations in it.
 import logging
+from datetime import datetime
 
 import requests
 
@@ -42,7 +43,10 @@ def get_current_weather(api_key, location, language, logger):
                 "longitude": lon,
                 "name": location_data[0]['name'],
                 # "native_name": native_name,  # add the native name
-                "country_code": location_data[0]['country'].lower(),  # convert to lowercase            },
+                "country_code": location_data[0]['country'].upper()
+            },
+            "day": datetime.now().strftime("%A"),
+            "time": datetime.now().strftime("%I:%M"),
             "weather": {
                 "description": weather_data['weather'][0]['description'],
                 "temperature": weather_data['main']['temp'],
@@ -51,8 +55,8 @@ def get_current_weather(api_key, location, language, logger):
                 "pressure": weather_data['main']['pressure'],
                 "sunrise": weather_data['sys']['sunrise'],
                 "sunset": weather_data['sys']['sunset'],
-                "icon_url": f"https://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png"
-            }
+                "icon_url": f"https://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png",
+                "icon": weather_data['weather'][0]['icon']
             }
         }
     else:
