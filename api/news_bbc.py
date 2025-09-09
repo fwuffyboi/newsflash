@@ -1,6 +1,4 @@
 # this file has BBC news integrations
-
-
 def get_headlines_bbc_news(region: str):
     """
     Fetches the latest UK headlines from BBC News.
@@ -23,7 +21,7 @@ def get_headlines_bbc_news(region: str):
         headlines = []
 
         for area in region:
-            if   area == "uk":
+            if area == "uk":
                 url = "https://feeds.bbci.co.uk/news/uk/rss.xml"  # BBC News UK RSS feed URL
             elif area == "usc":
                 url = "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
@@ -40,7 +38,7 @@ def get_headlines_bbc_news(region: str):
             soup = BeautifulSoup(response.content, 'xml')  # Parse the XML content
 
             # My personal word blocklist, shit I don't care about or want to see on the daily
-            blocklist = ["rape", "abuse", "stab", "stabbing", "prince"]
+            blocklist = []
 
             # set up a temporary list to house the headlines of just this area, then late on add it all together
             temp_lines = []
@@ -67,13 +65,9 @@ def get_headlines_bbc_news(region: str):
             if len(temp_lines) > 6:
                 temp_lines = temp_lines[:5]
 
-            print(temp_lines)
-
             # Add the region as well as the temp_lines
             temp_lines = {area: temp_lines}
             headlines.append(temp_lines)
-
-        print(headlines)
 
         # after going through every provided region, provide the final result of all headlines.
         return headlines

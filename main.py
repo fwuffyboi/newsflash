@@ -34,6 +34,7 @@ logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 
 from api.news_bbc import get_headlines_bbc_news
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, rate_air_quality
@@ -48,6 +49,7 @@ load_dotenv()
 # Take variables from the .env file and set them here
 LOCATION = os.getenv(             "LOCATION", "Krakow, Poland")  # Default to Kraków if not set
 
+MIRROR_ACTIVITY = True # Important!!!!!! This defines if the mirror should be on.
 
 OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
 OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY")
@@ -69,9 +71,9 @@ SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE", "en-US")  # Default to "en
 
 TFL_ENABLED = os.getenv(          "TFL_ENABLED", "true")
 TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
-TFL_BUSSES_ENABLED = os.getenv(   "TFL_BUSSES_ENABLED", "true")
+TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
 
-TFL_BUSSES = os.getenv(           "TFL_BUSSES", "18,25,29,140,149,243,207")
+TFL_BUS_ROUTES = os.getenv(           "TFL_BUSES", "18,25,29,140,149,243,207")
 
 
 GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL")
@@ -81,6 +83,7 @@ GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL")
 if __name__ == "__main__":
     # Start the fastapi web server
     app = Flask(__name__)
+    CORS(app, origins=["*"]) # enable CORS on all routes.
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True  # Make JSON responses pretty
     app.config['JSON_SORT_KEYS'] = False  # Do not sort keys in JSON responses
     app.config['TEMPLATES_AUTO_RELOAD'] = True  # Automatically reload templates on change
@@ -113,8 +116,10 @@ if __name__ == "__main__":
     APPLICATION_USER_WARNINGS = []
 
     if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
-        warning_message = ("YOU HAVE NOT SET THE MET OFFICE WEATHER WARNING LOCATION. WHILE NOT REQUIRED, "
-                           "IT MAY BE HELPFUL IN AN EMERGENCY. FOLLOW THE INSTRUCTIONS IN THE .ENV FILE TO SET YOURS. "
+        warning_message = ("YOU HAVE NOT SET THE MET OFFICE WEATHER WARNING LOCATION. "
+                           "THIS IS THE LOCATION THAT THE APPLICATION WILL CHECK FOR WEATHER WARNINGS IN THE UNITED KINGDOM."
+                           "WHILE NOT REQUIRED, IT MAY BE HELPFUL IN AN EMERGENCY. "
+                           "FOLLOW THE INSTRUCTIONS IN THE .ENV FILE TO SET YOURS. "
                            "ALTERNATIVELY, TO REMOVE THIS WARNING, CHANGE IT TO \"NOTUK\".")
         APPLICATION_USER_WARNINGS.append(warning_message)
         logging.warning(warning_message)
@@ -168,6 +173,17 @@ if __name__ == "__main__":
                 logging.error(f"Error serving web page {subpath}: {e}")
                 return {"message": "Error serving web page."}, 500
 
+    @app.route("/activity/")
+    async def activity_flask():
+        """
+        This endpoint returns either true or false in json. If true, the mirror should activate and be working.
+        """
+        if MIRROR_ACTIVITY:
+            return {"activity": True}
+        else:
+            return {"activity": False}
+
+
     @app.route("/api/v1/users-name")
     async def api_users_name():
         return {"name": USERS_NAME}, 200
@@ -184,17 +200,17 @@ if __name__ == "__main__":
         if not SPOTIFY_ENABLED:
             return {"message": "Spotify integration is disabled."}, 403
 
-        from api.spotify import get_current_track_spotify
+        from api.spotify import get_next_4_tracks_spotify
 
         if not SPOTIFY_ACCESS_TOKEN:
             return {"message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
 
-        current_track_info = get_current_track_spotify(
+        current_track_info = get_next_4_tracks_spotify(
             SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
             SPOTIFY_LANGUAGE, logging
         )
         if not current_track_info:
-            return {"message": "User is not listening to anything."}, 200
+            return {"message": "User is not listening to anything or there was a spotify API error."}, 200
 
         return current_track_info, 200
 
@@ -226,8 +242,8 @@ if __name__ == "__main__":
         if TFL_ENABLED != "true":
             return {"message": "TFL statuses are disabled."}, 200
 
-        if TFL_BUSSES_ENABLED == "true":
-            resp = get_set_bus_statuses_tfl(TFL_BUSSES, logging)
+        if TFL_BUSES_ENABLED == "true":
+            resp = get_set_bus_statuses_tfl(TFL_BUS_ROUTES, logging)
             if not resp:
                 return {"message": "TFL bus statuses are not available."}, 404
 
@@ -286,7 +302,6 @@ if __name__ == "__main__":
         Endpoint to get the latest BBC news headlines.
         :return : JSON response with the latest headlines and a 200 status code.
         """
-        # todo/implement fully
         return get_headlines_bbc_news(BBC_NEWS_REGION), 200
 
     @app.route("/api/v1/weather/current/")
@@ -307,6 +322,10 @@ if __name__ == "__main__":
 
     @app.route("/api/v1/weather/warnings/")
     async def get_weather_warnings_flask():
+
+        if MET_OFFICE_WEATHER_WARNING_REGION == "NOTUK":
+            return {"message": "This endpoint is disabled."},
+
         wa = get_current_weather_warnings_UKONLY(MET_OFFICE_WEATHER_WARNING_REGION, logging)
 
         if wa == []:
@@ -320,7 +339,6 @@ if __name__ == "__main__":
 
     @app.route("/api/v1/air-quality/current/")
     async def get_current_air_quality_flask():
-        # todo/make cleaner and separate more into functions
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
 

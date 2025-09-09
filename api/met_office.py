@@ -39,7 +39,7 @@ def get_current_weather_warnings_UKONLY(uk_region, logger) -> list[Any] | None:
                                         'No Warning Level')  # Get the warning level from the data-level attribute
             if warning_level == "No Warning Level":
                 raise ValueError(
-                    "Warning level not found in the section. Please check the HTML structure of the Met Office page.")
+                    "Warning level not found the section. Please verify the XML structure.")
 
             title = section.find('h3').text.strip() if section.find('warning-header') else "No Title"  # todo/fix
             description = section.find('p').text.strip() if section.find('p') else "No Description"
@@ -60,8 +60,7 @@ def get_current_weather_warnings_UKONLY(uk_region, logger) -> list[Any] | None:
             print(
                 f"Title: {title}, Description: {description}, Level: {warning_level}, Valid from-to: {valid_from_period}-{valid_to_period}, Link: {link}")  # todo/debug
 
-        print(f"Found {len(warnings)} weather warnings from the Met Office.")  # todo/debug
-        # print(warnings) # todo/debug
+        logger.info(f"Found {len(warnings)} weather warnings from the Met Office.")
 
         return warnings
     except Exception as e:

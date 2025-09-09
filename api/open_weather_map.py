@@ -89,7 +89,7 @@ def get_weather_forecast(api_key, location, language, logger):
         #     native_name = location_data['results'][0]['formatted_address'] if 'formatted_address' in location_data['results'][0] else None
         # response_data = response.json()
         # response_data['location']['native_name'] = native_name  # add the native name to the response
-        print(response.json())  # todo
+
         return response.json()
     else:
         raise Exception(
@@ -113,7 +113,6 @@ def get_current_air_quality(api_key, lang, location, logger):
     response = requests.get(url)
 
     if response.status_code == 200:
-        logger.info(response.json())  # todo
 
         # figure out the healthiness of the air
         rating, aqi = rate_air_quality(response.json(), logger)
@@ -130,8 +129,7 @@ def get_current_air_quality(api_key, lang, location, logger):
 
 
 def rate_air_quality(air_response, logger):
-    aqi_list = []
-    # Return a worded rating based on the aqi value
+    """Returns a worded rating based on the aqi value (e.g(s): Great!, Good, Moderate, Unhealthy, Hazardous"""
 
     logger.info(air_response)
 

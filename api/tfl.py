@@ -40,8 +40,8 @@ def all_train_status_tfl(logger):
         logger.error(f"Error fetching TFL train status. Status: {response.status_code} --- Response: {response.text}")
         return None
 
-def get_set_bus_statuses_tfl(busses, logger):
-    if not busses:
+def get_set_bus_statuses_tfl(buses, logger):
+    if not buses:
         logger.error(f"No buses provided.")
         return None
 
@@ -50,16 +50,16 @@ def get_set_bus_statuses_tfl(busses, logger):
     response = requests.get(url)
 
     bus_statuses_data = []
-    busses = busses.split(',')
+    buses = buses.split(',')
 
     if response.status_code == 200:
         response = response.json()
         for line_no in range(len(response)):
             bus_name = response[line_no]['name']
 
-            # check if the bus name matches any of the ones in busses
-            for bus in busses: # check each bus in busses
-                if bus.lower() == bus_name.lower(): # if bus name is a match to one in busses
+            # check if the bus name matches any of the ones in buses
+            for bus in buses: # check each bus in buses
+                if bus.lower() == bus_name.lower(): # if bus name is a match to one in buses
                     bus_status_no = response[line_no]['lineStatuses'][0]['statusSeverity']
 
                     if bus_status_no != 10:
