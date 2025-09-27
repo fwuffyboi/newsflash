@@ -9,7 +9,21 @@
     let activityHTTPError = '';
     let activeTopWidget = 'spotify';
 
-    let spotifyFixedData = {};
+    let spotifyFixedData = {
+        "title":       "",
+        "album":       "",
+        "artists":     "",
+        "cover":       "",
+        "device_name": "",
+        "device_type": "",
+        "duration_ms": 1000,
+        "progress_ms": 0,
+        "is_playing":  true,
+        "id":          "",
+        "link":        "",
+
+        "queue":       {}
+    };
 
     onMount(() => {
         const updateTime = () => {
@@ -63,27 +77,51 @@
 
                 // Create a temp list var for the queue and each track in it
                 let spotifyQueueItem;
-                let spotifyQueueList;
-                for (spotifyQueueItem in data.next_tracks) {
-                    spotifyQueueList += data.next_tracks[spotifyQueueItem];
+                let spotifyQueueList = {};
+
+                // check if the user has any playback
+                if (data.message == "User is not listening to anything or there was a spotify API error.") {
+
+                    // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
+                    spotifyFixedData = {
+                        "title":       "Nothing is playing right now...",
+                        "album":       "",
+                        "artists":     "",
+                        "cover":       "/blank_album_spotify.png",
+                        "device_name": "",
+                        "device_type": "",
+                        "duration_ms": 0,
+                        "progress_ms": 0,
+                        "is_playing":  false,
+                        "id":          "",
+                        "link":        "",
+
+                        "queue": {}
+                    };
+
+
+                } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
+                    for (spotifyQueueItem in data.next_tracks) {
+                        spotifyQueueList += data.next_tracks[spotifyQueueItem];
+                    }
+
+                    spotifyFixedData = {
+                        "title":       data.current_track.track_name,
+                        "album":       data.current_track.album,
+                        "artists":     data.current_track.artists,
+                        "cover":       data.current_track.cover,
+                        "device_name": data.current_track.device,
+                        "device_type": data.current_track.device_type,
+                        "duration_ms": data.current_track.duration_ms,
+                        "progress_ms": data.current_track.progress_ms,
+                        "is_playing":  data.current_track.is_playing,
+                        "id":          data.current_track.id,
+                        "link":        data.current_track.link,
+
+                        "queue":       spotifyQueueList
+                    };
+                    console.log(spotifyFixedData)
                 }
-
-                spotifyFixedData = {
-                    "title": data.current_track.track_name,
-                    "album": data.current_track.album,
-                    "artists": data.current_track.artists,
-                    "cover": data.current_track.cover,
-                    "device_name": data.current_track.device,
-                    "device_type": data.current_track.device_type,
-                    "duration_ms": data.current_track.duration_ms,
-                    "progress_ms": data.current_track.progress_ms,
-                    "is_playing": data.current_track.is_playing,
-                    "id": data.current_track.id,
-                    "link": data.current_track.link,
-
-                    "queue": spotifyQueueList
-                };
-                console.log(spotifyFixedData)
 
             })
     }
@@ -97,7 +135,7 @@
 	<meta name="description" content="The KIRASTAR NewsFlash application." />
 </svelte:head>
 
-<section class="flex flex-col justify-right items-end pt-5 pr-6 italic text-white">
+<section class="flex flex-col justify-right items-end p-5 italic text-white">
 
     <h1 class="font-[Funnel_Display] font-bold text-6xl">{time}</h1>
 
