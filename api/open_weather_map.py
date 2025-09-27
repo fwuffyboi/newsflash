@@ -1,8 +1,10 @@
 # this file has all google api integrations in it.
 import logging
 from datetime import datetime
+from io import BytesIO
 
 import requests
+from PIL import Image
 
 from api.geocoding import geocodeLocation
 
@@ -159,3 +161,43 @@ def rate_air_quality(air_response, logger):
             "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}."}
 
     return caq_rating, aqi_no
+
+
+def get_owm_tile(layer_name, location, api_key, logger):
+
+    z = 4 # zoom level
+
+    # geocode the location to populate z,x and y
+    lat, lon, location_data = geocodeLocation(api_key, location, logger)
+
+    # Number of tiles in each direction
+    n = 2 ** z
+
+    # Calculate the longitude and latitude divisions
+    lon_division = 360 / n
+    lat_division = (180 * 2) / n  # becauseMercator projection stretches more at higher zoom levels, but we are using equal degrees for simplicity.
+
+    x = int((lon + 180) // lon_division)
+    y = int((lat - (-90)) // lat_division)
+
+    print("(OWM.PY - GETOWMTILE) - LOCATION_DATA: ")
+    print(location_data)
+
+    url = f"https://tile.openweathermap.org/map/{layer_name}/{z}/{x}/{y}.png?appid={api_key}"
+
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            tile_image = Image.open(BytesIO(response.content))
+            # show image
+            Image.Image.show(tile_image)
+
+            return tile_image
+
+    except Exception as e:
+        logger.error(f"Couldn't retrieve weather layer: {str(e.__traceback__)}")
+
+    return None
+
+
+
