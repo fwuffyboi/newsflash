@@ -22,6 +22,7 @@
         animateProg();
     });
 
+    // todo: leftover code, idk what to fuckin do with this
     function msToMinSec(millis) {
         let minutes;
         let seconds;
@@ -40,7 +41,7 @@
 
 <!--This component handles the spotify integration.-->
 
-<section class="h-65 max-h-full flex flex-row">
+<section class="h-50 max-h-full flex flex-row">
 
     <!-- Left side -->
     {#if songName === "Nothing is playing right now..."}
