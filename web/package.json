@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"@inlang/paraglide-js": "^2.0.0",
+		"bwip-js": "^4.7.0",
 		"colorthief": "^2.6.0",
 		"lucide-svelte": "^0.542.0",
 		"qrcode": "^1.5.4"
