@@ -49,6 +49,7 @@ def get_current_weather(api_key, location, language, logger):
             },
             "day": datetime.now().strftime("%A"),
             "time": datetime.now().strftime("%I:%M"),
+            "format": 'metric',
             "weather": {
                 "description": weather_data['weather'][0]['description'],
                 "temperature": weather_data['main']['temp'],
