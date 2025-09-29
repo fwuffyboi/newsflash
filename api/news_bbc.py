@@ -38,7 +38,7 @@ def get_headlines_bbc_news(region: str):
             soup = BeautifulSoup(response.content, 'xml')  # Parse the XML content
 
             # My personal word blocklist, shit I don't care about or want to see on the daily
-            blocklist = []
+            blocklist = ['rape']
 
             # set up a temporary list to house the headlines of just this area, then late on add it all together
             temp_lines = []
