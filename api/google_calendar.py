@@ -18,8 +18,12 @@ def get_calendar_events_google(cal_url, logger):
 
     try:
         now = datetime.now(timezone.utc)
+
         # Filter events that end after now
+        print(sorted(cal.events, key=lambda e: e.begin))
         upcoming_events = [event for event in cal.events if event.end.datetime > now]
+        print(upcoming_events)
+
         # Sort by start time ascending
         upcoming_events = sorted(upcoming_events, key=lambda e: e.begin)
 
@@ -28,10 +32,10 @@ def get_calendar_events_google(cal_url, logger):
         for event in upcoming_events[:10]:
             next_10_events.append(
                 {
-                    "title": str(event.name),
-                    "desc": str(event.description),
-                    "start": str(event.begin.datetime),
-                    "end": str(event.end.datetime),
+                    "title":    str(event.name),
+                    "desc":     str(event.description),
+                    "start":    str(event.begin.datetime),
+                    "end":      str(event.end.datetime),
                     "location": str(event.location),
                     "duration": str(event.duration)
                 }
