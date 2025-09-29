@@ -1,64 +1,47 @@
-# this file has all met office api integrations in it.
-from typing import Any
+# this file has all met office integrations in it.
+import feedparser
 
-
-def get_current_weather_warnings_UKONLY(uk_region, logger) -> list[Any] | None:
+def get_current_weather_warnings_UKONLY(uk_region, logger):
     """
-    Scrapes potential weather warnings from the Met Office website.
+    Scrapes potential weather warnings from the Met Office RSS list.
 
     :return: A dictionary containing weather warning data.
     """
-    
-    import requests
-    from bs4 import BeautifulSoup
 
     url = f"https://weather.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/{uk_region}"
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        logger.error(f"Request to {url} failed with status code {response.status_code}. Response: {response.text}")
-        return None
-
-    soup = BeautifulSoup(response.content, 'xml')
+    # url = f"http://localhost:5173/UK" # testing url
+    try:
+        feed = feedparser.parse(url)
+    except Exception as e:
+        logger.error(f"Attempt to get weather warnings failed. Error: feedparser e:{e.__traceback__}")
+        return ['!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!',
+                '!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!',
+                '!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!'
+        ]
 
     warnings = []
 
     try:
+        # Get the link to more details
+        for entry in feed.entries:
+            print(entry)
+            title = entry.title
+            description = entry.description
+            link = entry.link
+            if 'red warning' in str(title).lower():
+                warn_level = 'Red'
+            elif 'amber warning' in str(title).lower():
+                warn_level = 'Amber'
+            elif 'yellow warning' in str(title).lower():
+                warn_level = 'Yellow'
+            else:
+                warn_level = 'Unknown'
 
-        # Find all warning sections
-        warning_sections = soup.find_all('div', class_='warning-card')
+            warnings.append({'level': warn_level, 'title': title, 'desc': description, 'link': link})
 
-
-        if not warning_sections:
-            return []
-
-        for section in warning_sections:
-
-            # Extract the warning level from a div with class 'warning-card'. The warning level is in a field on the same div with a value called "data-level".
-            warning_level = section.get('data-level',
-                                        'No Warning Level')  # Get the warning level from the data-level attribute
-            if warning_level == "No Warning Level":
-                raise ValueError(
-                    "Warning level not found the section. Please verify the XML structure.")
-
-            title = section.find('h3').text.strip() if section.find('warning-header') else "No Title"  # todo/fix
-            description = section.find('p').text.strip() if section.find('p') else "No Description"
-
-            # Get the warning validity period from 2 sections
-            valid_from_period = section.find('div').text.strip() if section.find('div',
-                                                                                 class_='valid-from') else "Unknown Valid From Period"
-            valid_from_period += section.find('lower date') if section.find('div',
-                                                                            class_='valid-from') else "Unknown Valid From Period"
-
-            valid_to_period = section.find('div').text.strip() if section.find('div',
-                                                                               class_='valid-TO') else "Unknown Valid From period"
-
-            # Get the link to more details
-            link = section.find('a')['href'] if section.find('a') else "No Link"
-            warnings.append({'title': title, 'desc': description, 'link': link})
-
-            print(
-                f"Title: {title}, Description: {description}, Level: {warning_level}, Valid from-to: {valid_from_period}-{valid_to_period}, Link: {link}")  # todo/debug
+            logger.info(
+                f"!!!WEATHER WARNING FOUND!!!: Title: {title}, Description: {description}, "
+                f"Level: {warn_level}, Link: {link}")
 
         logger.info(f"Found {len(warnings)} weather warnings from the Met Office.")
 
