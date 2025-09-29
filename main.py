@@ -126,47 +126,25 @@ if __name__ == "__main__":
 
     @app.route("/api/config/")
     async def api_config():
+        enabled_apis = []
         if OPEN_WEATHER_ENABLED == "true":
-            owme = True
-        else:
-            owme = False
+            enabled_apis.append("owm")
         if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
-            moe = False
-        else:
-            moe = True
-        if BBC_NEWS_REGION == "":
-            bbce = False
-        else:
-            bbce = True
+            enabled_apis.append("met-office-uk")
+        if BBC_NEWS_REGION != "":
+            enabled_apis.append("bbc-news")
         if SPOTIFY_ENABLED == "true":
-            se = True
-        else:
-            se = False
+            enabled_apis.append("spotify")
         if TFL_TRAINS_ENABLED == "true":
-            tfl_t = True
-        else:
-            tfl_t = False
+            enabled_apis.append("tfl-trains")
         if TFL_BUSES_ENABLED == "true":
-            tfl_b = True
-        else:
-            tfl_b = False
-        if GOOGLE_CALENDAR_ICS_URL == "":
-            gcal = False
-        else:
-            gcal = True
+            enabled_apis.append("tfl-buses")
+        if GOOGLE_CALENDAR_ICS_URL != "":
+            enabled_apis.append("g-cal")
 
         return {
             "user_name": USERS_NAME,
-
-            "routes": {
-                "OWM": owme,
-                "MET_OFFICE": moe,
-                "BBC_NEWS": bbce,
-                "SPOTIFY": se,
-                "TFL_TRAINS": tfl_t,
-                "TFL_BUSES": tfl_b,
-                "G_CAL": gcal
-            }
+            "enabled_apis": enabled_apis
         }
 
     @app.route("/web/")
