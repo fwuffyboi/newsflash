@@ -11,9 +11,9 @@ from api.geocoding import geocodeLocation
 
 def get_current_weather(api_key, location, language, logger):
     """
-    Fetches the current weather for a given location using the Open Weather Map API.
+    Fetches the current weather for a given location using the Open CurrentWeather Map API.
 
-    :param api_key: Open Weather Map API key.
+    :param api_key: Open CurrentWeather Map API key.
     :param location: The location for which to fetch the weather. String or dict with 'latitude' and 'longitude'.
     :param language: The language for the weather description.
     :param logger:
@@ -71,7 +71,7 @@ def get_current_weather(api_key, location, language, logger):
 
 def get_weather_forecast(api_key, location, language, logger):
     """
-    Fetches the weather forecast for a given location using the Google Weather API.
+    Fetches the weather forecast for a given location using the Google CurrentWeather API.
 
     :param api_key: OpenWeatherMap API key.
     :param location: The location for which to fetch the weather forecast. String or dict with 'latitude' and 'longitude'.
