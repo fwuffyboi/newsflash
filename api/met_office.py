@@ -43,7 +43,7 @@ def get_current_weather_warnings_UKONLY(uk_region, logger):
                 f"!!!WEATHER WARNING FOUND!!!: Title: {title}, Description: {description}, "
                 f"Level: {warn_level}, Link: {link}")
 
-        logger.info(f"Found {len(warnings)} weather warnings from the Met Office.")
+        logger.info(f"Found {len(warnings)} weather warnings from the Met Office for region \"{uk_region}\".")
 
         return warnings
     except Exception as e:
