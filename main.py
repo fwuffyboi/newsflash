@@ -127,7 +127,7 @@ if __name__ == "__main__":
         enabled_apis = []
         if OPEN_WEATHER_ENABLED == "true":
             enabled_apis.append("owm")
-        if MET_OFFICE_WEATHER_WARNING_REGION != "NOTSET":
+        if MET_OFFICE_WEATHER_WARNING_REGION not in ["NOTSET", "NOTUK"]:
             enabled_apis.append("met-office-uk")
         if BBC_NEWS_REGION != "":
             enabled_apis.append("bbc-news")
