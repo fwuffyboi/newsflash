@@ -3,8 +3,10 @@
 ########################################################################################################################
 
 import requests
-from ics import Calendar
-from datetime import datetime, timezone
+import icalendar
+import recurring_ical_events
+from datetime import datetime, timezone, time, timedelta
+
 
 def get_calendar_events_google(cal_url, logger):
     # Parse the URL
@@ -14,34 +16,37 @@ def get_calendar_events_google(cal_url, logger):
         logger.error("Error getting calendar events from Google Calendar: {} - {}.".format(cal_req.status_code, cal_req.text[:40]))
         return None
 
-    cal = Calendar(cal_req.text)
+    cal = icalendar.Calendar.from_ical(cal_req.text)
 
     try:
-        now = datetime.now(timezone.utc)
+        local_tz = datetime.now().astimezone().tzinfo
+        today = datetime.now().date()
+        start_of_today = datetime.combine(today, time.min, tzinfo=local_tz)
+        end_of_today = datetime.combine(today, time.max, tzinfo=local_tz)
 
-        # Filter events that end after now
-        print(sorted(cal.events, key=lambda e: e.begin))
-        upcoming_events = [event for event in cal.events if event.end.datetime > now]
-        print(upcoming_events)
+        query = recurring_ical_events.of(cal)
+        all_events = query.between(start_of_today,
+                                   end_of_today + timedelta(seconds=1))  # include events ending at 23:59:59
 
-        # Sort by start time ascending
-        upcoming_events = sorted(upcoming_events, key=lambda e: e.begin)
+        next_events = []
+        for event in all_events:
+            if str(event["DTEND"].dt - event["DTSTART"].dt) == "1 day, 0:00:00":
+                duration = "All day"
+            else:
+                duration = str(event["DTEND"].dt - event["DTSTART"].dt)
 
-        # Make the next 10 events into json manually so it is possible to return without errors :3c
-        next_10_events = []
-        for event in upcoming_events[:10]:
-            next_10_events.append(
+            next_events.append(
                 {
-                    "title":    str(event.name),
-                    "desc":     str(event.description),
-                    "start":    str(event.begin.datetime),
-                    "end":      str(event.end.datetime),
-                    "location": str(event.location),
-                    "duration": str(event.duration)
+                    "title": str(event.get("SUMMARY", "")),
+                    "desc":  str(event.get("DESCRIPTION", "")),
+                    "start": str(event["DTSTART"].dt),
+                    "end":   str(event["DTEND"].dt),
+                    "location": event.get("LOCATION", ""),
+                    "duration": duration,
                 }
             )
 
-        return next_10_events
+        return next_events
     except Exception as e:
-        logger.error("There was an issue with get_calendar_events_google. Error: {}.".format(e))
+        logger.error("There was an error in get_calendar_events_google. Error: {}.".format(e))
         return None
