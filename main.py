@@ -145,10 +145,6 @@ if __name__ == "__main__":
             "enabled_apis": enabled_apis
         }
 
-    @app.route("/api/v1/users-name")
-    async def api_users_name():
-        return {"name": USERS_NAME}, 200
-
     @app.route("/api/v1/spotify/now-playing/")
     async def get_current_track_spotify():
         """
@@ -189,7 +185,7 @@ if __name__ == "__main__":
         if not train_status:
             return {"message": "No train status data available. Please check the logs for more information."}, 204
 
-        return {"train_status": train_status}, 200
+        return train_status, 200
 
 
     @app.route("/api/v1/transport/tfl/bus-status/")
