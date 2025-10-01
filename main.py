@@ -21,8 +21,6 @@ logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelnam
 # Make it so logs can be printed to the console (helpful for debugging)
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)
-# logging.getLogger().addHandler(logging.StreamHandler(sys.stdout)) # this is annoying and messes with the console logging
 
 # So logs can also go to a file
 fileHandler = logging.FileHandler("{0}/{1}".format(logFilePath, logFileName))
@@ -129,7 +127,7 @@ if __name__ == "__main__":
         enabled_apis = []
         if OPEN_WEATHER_ENABLED == "true":
             enabled_apis.append("owm")
-        if MET_OFFICE_WEATHER_WARNING_REGION == "NOTSET":
+        if MET_OFFICE_WEATHER_WARNING_REGION != "NOTSET":
             enabled_apis.append("met-office-uk")
         if BBC_NEWS_REGION != "":
             enabled_apis.append("bbc-news")
@@ -146,33 +144,6 @@ if __name__ == "__main__":
             "user_name": USERS_NAME,
             "enabled_apis": enabled_apis
         }
-
-    @app.route("/web/")
-    async def web_index():
-        # Serve the index.html file from the web directory
-        try:
-            return send_from_directory('web', 'index.html')
-        except Exception as e:
-            if "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." in str(
-                    e):
-                logging.error(f"Index page not found.")
-                return send_from_directory('web', '404.html'), 404
-            else:
-                logging.error(f"Error serving index page: {e}")
-                return {"message": "Error serving index page."}, 500
-
-    @app.route("/web/<path:subpath>/")
-    async def web(subpath):
-        # Serve other web pages based on the subpath
-        try:
-            return send_from_directory('web', subpath)
-        except Exception as e:
-            if "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." in str(e):
-                logging.error(f"Web page {subpath} not found.")
-                return send_from_directory('web', '404.html'), 404
-            else:
-                logging.error(f"Error serving web page {subpath}: {e}")
-                return {"message": "Error serving web page."}, 500
 
     @app.route("/api/v1/users-name")
     async def api_users_name():
