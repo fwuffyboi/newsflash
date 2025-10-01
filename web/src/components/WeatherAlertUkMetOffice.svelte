@@ -4,7 +4,7 @@
     let weather_alerts: any[] = $state([]);
 
     onMount(() => {
-        fetch("http://192.168.0.226:8080/api/v1/weather/warnings/")
+        fetch("http://192.168.0.226:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -25,7 +25,7 @@
     });
 </script>
 
-<!-- Weather Alert Area -->
+<!-- CurrentWeather Alert Area -->
 {#if (weather_alerts.length > 0)}
     <section class=" flex flex-col h-auto min-w-60 max-w-140 rounded-lg grad p-3 from-amber-600 to-red-700 bg-linear-140 text-white">
         <div class="w-auto h-auto flex flex-row gap-2 pb-1">

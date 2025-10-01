@@ -1,6 +1,24 @@
 <script>
 
-    let { songName = "Loading..", songArtists = "Loading..", albumName = "Loading..", albumImg, duration = 1188125, songURL, nowPlaying = true, pgs = 0 } = $props();
+    import {onMount} from "svelte";
+    import bwipjs from '@bwip-js/browser';
+
+    let { songName = "Loading..", songArtists = "Loading..", albumName = "Loading..", albumImg, songURL, nowPlaying = true} = $props();
+
+    onMount(() => {
+        // Draw the datamatrix barcode after the canvas is mounted
+        try {
+            bwipjs.toCanvas("qrcanvas", {
+                bcid:        'datamatrix',
+                text:        songURL,
+                scale:       5,
+                height:      5,
+                width:       5
+            });
+        } catch (e) {
+            console.error("bwipjs error:", e);
+        }
+    })
 
 </script>
 
@@ -29,6 +47,14 @@
 
         </div>
         <img class="h-full w-auto aspect-square bg-black border-gray-400 border-2 rounded-lg " alt="The album cover for the album {albumName}" src={albumImg} id="aac" crossOrigin="anonymous" />
+
+<!--        <div class="text-right text-white">-->
+<!--            <span class="italic">Scan for song bleh</span>-->
+<!--            <div class="w-23 h-23 bg-white">-->
+<!--                <canvas class="w-full h-full aspect-square p-1" id="qrcanvas" ></canvas>-->
+<!--            </div>-->
+
+<!--        </div>-->
 
     </section>
 {/if}

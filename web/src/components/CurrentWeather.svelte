@@ -8,22 +8,22 @@
     import AirQuality from "./AirQuality.svelte";
     import {onMount} from "svelte";
 
-    let desc =       $state("");
-    let loc =        $state("");
+    let desc =       $state("Loading...");
+    let loc =        $state("Loading...");
     let humidity =   $state(0);
     let sunrise =    $state(0);
     let sunset =     $state(0);
     let temp =       $state(0.0);
-    let temp_str =   $state('');
+    let temp_str =   $state('??');
     let wind =       $state(7.77);
     let icon =       $state("01d");
-    let units = 'metric';
+    let units =      $state("Unknown");
 
     let bg_gradient = $state("")
     let lucide_icon = $state("")
 
     onMount(() => {
-        fetch("http://192.168.0.226:8080/api/v1/weather/current/")
+        fetch("http://192.168.0.226:8080/api/v1/weather/current/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -35,6 +35,7 @@
                 temp = data.weather.temperature;
                 wind = data.weather.wind_speed;
                 icon = data.weather.icon;
+                units = 'metric'
 
                 // process weather data
                 desc = desc[0].toUpperCase() + desc.slice(1); // uppercase first letter :3
