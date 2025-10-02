@@ -1,11 +1,14 @@
 <script>
     import {
-        Cloud, Sun, OctagonAlertIcon, CloudRain,
-        CloudLightning, CloudDrizzle, CloudSnow,
-        CloudFog, CloudAlert, Droplet, Wind,
-        Sunrise, Sunset
+        Cloud, Sun, CloudRain, CloudLightning,
+        CloudDrizzle, CloudSnow, CloudFog, CloudAlert,
+        Droplet, Wind, Sunrise, Sunset, TriangleAlert
     } from "lucide-svelte";
     import AirQuality from "./AirQuality.svelte";
+    import { weatherAlerts } from '../stores/weatherAlerts';
+    let alerts = $state([]);
+    alerts = $weatherAlerts;
+
     import {onMount} from "svelte";
 
     let desc =       $state("Loading...");
@@ -75,7 +78,7 @@
 </script>
 
 
-<section class="flex flex-col min-w-75 max-w-110 min-h-auto max-h-68 rounded-xl grad p-4 {bg_gradient} text-white">
+<section class="flex flex-col min-w-75 max-w-110 h-70 rounded-xl grad p-4 {bg_gradient} text-white">
 
     <div class="flex flex-row gap-2 text-lg">
         <div class="flex flex-col">
@@ -104,10 +107,15 @@
                 {#if lucide_icon === "cloud_err"}
                     <CloudAlert size="30"/>
                 {/if}
-                <span class="italic text-gray-200 pl-2">Current weather in</span>
+                <span class="italic text-gray-100 pl-2">Current weather in</span>
+            </div>
+            <div class="flex flex-row gap-2">
+                <span class="font-bold text-xl">{loc}</span>
+                {#if alerts.length > 0}
+                    <TriangleAlert class="animate-pulse bg-red-500 rounded-md p-1" size="30" />
+                {/if}
             </div>
 
-            <span class="font-bold text-xl">{loc}</span>
         </div>
 
 
@@ -118,7 +126,9 @@
         <span class="text-7xl animate-pulse">{temp_str}°</span>
 
         <div class="flex flex-col">
+
             <span>{desc}</span>
+
             <div class="flex flex-row">
                 <div class="flex flex-row">
                     <Droplet size="23"/>
@@ -129,7 +139,7 @@
                     <span class="pl-1">{wind}</span>
                 </div>
             </div>
-            <div class="text-gray-300"><span>All units in {units}</span></div>
+            <div class="text-gray-200"><span>All units in {units}</span></div>
         </div>
 
     </div>
