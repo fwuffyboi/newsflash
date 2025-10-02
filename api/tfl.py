@@ -19,12 +19,10 @@ def all_train_status_tfl(logger):
 
         response = response.json()
 
-        train_lines_data = []
+        train_lines_data = {}
 
         # for each json line in the response
         for line_no in range(len(response)):
-            logger.warn(line_no)
-            logger.warn(type(line_no))
             train_line_name = response[line_no]['name']
             train_line_status = response[line_no]['lineStatuses'][0]['statusSeverity']
             train_line_status_description = response[line_no]['lineStatuses'][0]['statusSeverityDescription']
@@ -33,7 +31,7 @@ def all_train_status_tfl(logger):
             if train_line_status != 10:
                 train_line_disruption_reason = response[line_no]['lineStatuses'][0]['reason']
 
-            train_lines_data.append({"train_line_name": train_line_name, "status_int": train_line_status, "status": train_line_status_description, "status_reason": train_line_disruption_reason})
+            train_lines_data[train_line_name] = {"status_int": train_line_status, "status": train_line_status_description, "status_reason": train_line_disruption_reason}
 
         return train_lines_data
     else:
