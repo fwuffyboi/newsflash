@@ -6,8 +6,7 @@
     } from "lucide-svelte";
     import AirQuality from "./AirQuality.svelte";
     import { weatherAlerts } from '../stores/weatherAlerts';
-    let alerts = $state([]);
-    alerts = $weatherAlerts;
+    let alerts = $state($weatherAlerts);
 
     import {onMount} from "svelte";
 
@@ -112,6 +111,7 @@
             <div class="flex flex-row gap-2">
                 <span class="font-bold text-xl">{loc}</span>
                 {#if alerts.length > 0}
+                    <!-- TODO/BUGFIX: doesnt show up sometimes and this is IMPORTANT -->
                     <TriangleAlert class="animate-pulse bg-red-500 rounded-md p-1" size="30" />
                 {/if}
             </div>
