@@ -104,7 +104,9 @@
                 console.log('Fetch Error: ', err);
                 activity = false;
                 if (err == "TypeError: NetworkError when attempting to fetch resource.") {
-                    activityHTTPError = time + ": Network error! - Could not ping API.";
+                    if (activityHTTPError !== "") {
+                        activityHTTPError = time + ": Network error! - Could not ping API.";
+                    }
                 } else {
                     activityHTTPError = (err);
                 }
