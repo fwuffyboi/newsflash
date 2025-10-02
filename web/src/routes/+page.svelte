@@ -6,6 +6,7 @@
     import CurrentWeather from "../components/CurrentWeather.svelte";
     import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
     import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
+    import BBCNews from "../components/BBCNews.svelte";
 
     let time: string = 'LOADING....';
     let activity = true;
@@ -74,7 +75,6 @@
 
         if ("spotify" in enabled_apis) {
             getSpotifyNowPlayingData();
-            console.log('spotify WORKS 1');
         }
 
         const timeInterval = setInterval(updateTime, 200);
@@ -87,7 +87,6 @@
             if ('spotify' in enabled_apis) {
                 clearInterval(SpotifyInterval);
             }
-            // clearInterval(componentInterval);
         }
     });
 

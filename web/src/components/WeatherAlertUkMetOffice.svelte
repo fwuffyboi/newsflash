@@ -22,7 +22,6 @@
                         });
                     }
                 }
-                console.log("MEOW", weather_alerts)
             });
     });
 </script>
