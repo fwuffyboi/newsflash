@@ -1,7 +1,7 @@
 # this file has all met office integrations in it.
 import feedparser
 
-def get_current_weather_warnings_UKONLY(uk_region, logger):
+def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     """
     Scrapes potential weather warnings from the Met Office RSS list.
 
@@ -9,7 +9,7 @@ def get_current_weather_warnings_UKONLY(uk_region, logger):
     """
 
     url = f"https://weather.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/{uk_region}"
-    # url = f"http://localhost:5173/UK" # testing url
+    # url = f"http://localhost:5173/UK" # TESTING URL
     try:
         feed = feedparser.parse(url)
     except Exception as e:
