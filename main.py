@@ -9,7 +9,7 @@ from api.met_office import get_current_weather_warnings_UKONLY
 # Set up logging
 rootLogger = logging.getLogger()
 
-# set log file details, these will probably become .env variables someday, sooo... TODO
+# Set log file details, these will probably become .env variables someday, sooo... TODO
 logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
 logFileName = f'newsflash-{logFileTime}.log'
 logFilePath = "."
@@ -39,7 +39,6 @@ from api.news_bbc import get_headlines_bbc_news
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, get_owm_tile
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
-from initialization import full_initialization
 
 if __name__ == "__main__":
     # Start the flask web server
@@ -50,9 +49,6 @@ if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True  # Automatically reload templates on change
 
     logging.info("Starting the NewsFlash web server...")
-
-    # First, run the full initialization
-    full_initialization(logging)
 
     # Set environment variables for the Flask app
     logging.info("Loading environment variables from .env file...")
