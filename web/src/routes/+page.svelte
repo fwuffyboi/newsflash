@@ -5,6 +5,7 @@
     import Spotify from "../components/Spotify.svelte";
     import CurrentWeather from "../components/CurrentWeather.svelte";
     import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
+    import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
 
     let time: string = 'LOADING....';
     let activity = true;
@@ -45,9 +46,9 @@
             bwipjs.toCanvas("dmcanvas", {
                 bcid:        'datamatrix',
                 text:        VERSION,
-                scale:       5,
-                height:      5,
-                width:       5
+                scale:       9,
+                height:      9,
+                width:       9
             });
         } catch (e) {
             console.error("bwipjs error:", e);
@@ -103,7 +104,7 @@
                 console.log('Fetch Error: ', err);
                 activity = false;
                 if (err == "TypeError: NetworkError when attempting to fetch resource.") {
-                    activityHTTPError = "Network error! - Could not ping API.";
+                    activityHTTPError = time + ": Network error! - Could not ping API.";
                 } else {
                     activityHTTPError = (err);
                 }
@@ -215,8 +216,11 @@
                     <CurrentWeather/>
                 {/if}
 
-                <!-- Calendar or day overview goes here?-->
-            </div>
+                {#if enabled_apis.includes('tfl-trains')}
+                    <TFLTrainStatuses />
+                {/if}
+
+                </div>
             {#if enabled_apis.includes('met-office-uk')}
                 <WeatherAlertUkMetOfficeUkMetOffice />
             {/if}
@@ -229,7 +233,7 @@
     <!-- Bottom right and left corners -->
     <div class="text-right text-white fixed bottom-1 left-1 mb-0">
         <span class="italic">{VERSION}</span>
-        <div class="w-23 h-23 bg-white">
+        <div class="w-23 h-23 bg-white rounded-sm">
             <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
         </div>
 
