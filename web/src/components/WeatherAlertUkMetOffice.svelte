@@ -82,6 +82,17 @@
                 {/if}
 
                 {#if wa_item.level === 'Unknown'}
+                    <div class="rounded-xl bg-gray-400 w-auto p-2">
+                        <div class="flex flex-col">
+                            <div class="animate-pulse">
+                                <span class="font-black text-lg tracking-tight">{wa_item.level} weather alert: </span>
+                                <span class="font-bold">{wa_item.title}</span>
+                            </div>
+                            <span class="font-light">{wa_item.desc}</span>
+
+                        </div>
+
+                    </div>
                 {/if}
 
             {/each}
