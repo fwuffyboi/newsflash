@@ -1,5 +1,5 @@
 # this file has BBC news integrations
-def get_headlines_bbc_news(region: str):
+def get_headlines_bbc_news(region: str, logger):
     """
     Fetches the latest UK headlines from BBC News.
 
@@ -8,9 +8,9 @@ def get_headlines_bbc_news(region: str):
 
     try:
         # take the rss feed url from the BBC News UK section and parse it to get the headlines
-        import requests
-        from bs4 import BeautifulSoup
+        import feedparser
 
+        # lowercase and split all regions in "region" var
         region = region.lower().split(",")
 
         # To check all provided regions are acceptable/valid
@@ -18,7 +18,8 @@ def get_headlines_bbc_news(region: str):
             if area not in ["uk", "usc", "world"]:
                 raise ValueError("Invalid region. Currently, only 'UK', 'USC', or 'WORLD' is accepted.")
 
-        headlines = []
+        headlines = {}
+        ahs = []
 
         for area in region:
             if area == "uk":
@@ -30,44 +31,41 @@ def get_headlines_bbc_news(region: str):
             else:
                 raise ValueError("Invalid region. Currently, only 'UK', 'USC', or 'WORLD' is accepted.")
 
-            response = requests.get(url)
-            if response.status_code != 200:
+            try:
+                feed = feedparser.parse(url)
+            except Exception as e:
+                logger.error(f"Failed to fetch data from BBC News. Error: feedparser can't parse url --- e: {e.__traceback__}")
                 raise Exception(
-                    f"Failed to fetch data from BBC News. Status: {response.status_code} --- Response: {response.text}")
-
-            soup = BeautifulSoup(response.content, 'xml')  # Parse the XML content
-
-            # My personal word blocklist, shit I don't care about or want to see on the daily
-            blocklist = ['rape']
+                    f"Failed to fetch data from BBC News. Error: feedparser can't parse url --- e: {e.__traceback__}")
 
             # set up a temporary list to house the headlines of just this area, then late on add it all together
-            temp_lines = []
-            item_count = 0
+            rh = []
 
-            for item in soup.find_all('item'):
+            for entry in feed.entries:
 
-                # Add 1 to the item counter so we know what article we're on
-                item_count += 1
+                title = entry.title.strip()
+                desc  = entry.description.strip()
+                link  = entry.link.strip()
+                media = entry.media_thumbnail
+                pubDate = entry.published.strip()
 
-                title = item.title.text.strip()
-                description = item.description.text.strip()
-                link = item.link.text.strip()
+                # # Check if the title or description contains any blocked words todo
+                # if any(blocked_word.lower() in title.lower() for blocked_word in blocklist):
+                #     title = f"This headline contains one or more of your chosen blocked words."  # If the title contains a blocked word, modify it
+                #
+                # if any(blocked_word.lower() in description.lower() for blocked_word in blocklist):
+                #     description = f"..."
 
-                # Check if the title or description contains any blocked words
-                if any(blocked_word.lower() in title.lower() for blocked_word in blocklist):
-                    title = f"This headline contains one or more of your chosen blocked words."  # If the title contains a blocked word, modify it
+                rh.append({'title': title, 'desc': desc, 'link': link, 'media': media, 'pubDate': pubDate})
 
-                if any(blocked_word.lower() in description.lower() for blocked_word in blocklist):
-                    description = f"..."
-
-                temp_lines.append({'title': title, 'desc': description, 'link': link})
-
-            if len(temp_lines) > 6:
-                temp_lines = temp_lines[:5]
+            if len(rh) > 6:
+                rh = rh[:6]
 
             # Add the region as well as the temp_lines
-            temp_lines = {area: temp_lines}
-            headlines.append(temp_lines)
+            ahs.append({area: rh})
+
+        # after getting all news for all regions
+        headlines = ahs
 
         # after going through every provided region, provide the final result of all headlines.
         return headlines
