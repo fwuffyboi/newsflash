@@ -1,5 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
+    import {weatherAlerts} from "../stores/weatherAlerts";
 
     let weather_alerts: any[] = $state([]);
 
@@ -11,6 +12,7 @@
 
                 // check if not empty
                 if (data.length !== 0 && !data.message) {
+                    weatherAlerts.set(data)
                     for (const element of data) {
                         weather_alerts.push({
                             'title': element.title,
@@ -80,7 +82,6 @@
                 {/if}
 
                 {#if wa_item.level === 'Unknown'}
-                    <!-- todo -->
                 {/if}
 
             {/each}
