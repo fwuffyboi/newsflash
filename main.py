@@ -4,7 +4,7 @@ import logging
 from operator import truediv
 
 from api.google_calendar import get_calendar_events_google
-from api.met_office import get_current_weather_warnings_UKONLY
+from api.met_office import GetCurrentWeatherWarningsMetOffice
 
 # Set up logging
 rootLogger = logging.getLogger()
@@ -252,7 +252,7 @@ if __name__ == "__main__":
         Endpoint to get the latest BBC news headlines.
         :return : JSON response with the latest headlines and a 200 status code.
         """
-        return get_headlines_bbc_news(BBC_NEWS_REGION), 200
+        return get_headlines_bbc_news(BBC_NEWS_REGION, logging), 200
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
@@ -276,7 +276,7 @@ if __name__ == "__main__":
         if MET_OFFICE_WEATHER_WARNING_REGION == "NOTUK":
             return {"message": "This endpoint is disabled."},
 
-        wa = get_current_weather_warnings_UKONLY(MET_OFFICE_WEATHER_WARNING_REGION, logging)
+        wa = GetCurrentWeatherWarningsMetOffice(MET_OFFICE_WEATHER_WARNING_REGION, logging)
 
         if wa == []:
             return {"message": "No weather warnings found."}, 200 # this prevents an error that happens when its empty list.
