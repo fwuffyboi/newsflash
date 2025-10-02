@@ -12,8 +12,6 @@
         fetch("http://192.168.0.226:8080/api/v1/air-quality/current/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-                console.log(data.aqi);
                 aqi = data.aqi;
 
                 if ([1,2,3,4,5].includes(aqi)) {
