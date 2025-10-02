@@ -1,7 +1,11 @@
+python-dotenv
 requests
 bs4
 flask[async]
 flask-cors
 dotenv
 spotipy
-ics
+icalendar
+recurring_ical_events
+feedparser
+pillow
