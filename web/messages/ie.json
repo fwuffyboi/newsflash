@@ -1,4 +1,19 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
-  "hello_world": "Hello, {name} from ie!"
+  "locale_changed": "Your locale has changed to {locale}!",
+  "choose_locale": "To set your locale, choose the button below that aligns with it.",
+  "visit_slash_locale": "If this service is required in another language, visit ",
+  "back_to_main_page_locale": "Click here to go back: ",
+
+  "current_weather_in": "Current weather in",
+  "all_units_in": "All units in {units}",
+  "last_updated": "Last updated: ",
+  "great_air_quality": "Great air quality!",
+  "good_air_quality": "Good air quality!",
+  "moderate_air_quality": "Moderate air quality",
+  "bad_air_quality": "Bad air quality!!",
+  "hazardous_air_quality": "Hazardous air quality!!",
+  "aqi_error": "AQI Error",
+
+  "nothings_playing": "Nothing's playing..."
 }

@@ -2,6 +2,7 @@
 
     import {CloudAlert, Frown, Laugh, Meh, Smile} from "lucide-svelte";
     import {onMount} from "svelte";
+    import {m} from "$lib/paraglide/messages.js"
 
     let aqi = $state(0);
 
@@ -17,23 +18,23 @@
                 if ([1,2,3,4,5].includes(aqi)) {
                     if (aqi === 1) {
                         bg_gradient = 'from-green-400 to-green-600';
-                        message = 'Great air quality!'
+                        message = m.great_air_quality();
                     } else if (aqi === 2) {
                         bg_gradient = 'from-green-400 to-yellow-400';
-                        message = 'Good air quality!'
+                        message = m.good_air_quality();
                     } else if (aqi === 3) {
                         bg_gradient = 'bg-amber-600';
-                        message = 'Moderate air quality'
+                        message = m.moderate_air_quality();
                     } else if (aqi === 4) {
                         bg_gradient = 'from-orange-400 to-amber-800';
-                        message = 'Bad air quality!'
+                        message = m.bad_air_quality();
                     } else if (aqi === 5) {
                         bg_gradient = 'from-orange-500 to-red-600';
-                        message = 'Hazardous air quality'
+                        message = m.hazardous_air_quality();
                     }
                 } else {
                     bg_gradient = 'from-gray-400 to-gray-600';
-                    message = 'AQI Error'
+                    message = m.aqi_error();
                 }
             })
     });

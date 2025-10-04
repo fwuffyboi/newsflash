@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { m } from '$lib/paraglide/messages.js'; // i18n
     import {CloudAlert} from 'lucide-svelte';
     import bwipjs from '@bwip-js/browser';
     import Spotify from "../components/Spotify.svelte";
@@ -244,6 +245,7 @@
     <div class="text-right text-white fixed bottom-0 right-1.5 mb-0 w-190">
         <div class="flex flex-col italic font-thin tracking-tighter animate-pulse">
             <span class="font-bold">!!!! DISCLAIMER: All information displayed is for informational purposes only. Do not rely on this device's information for ANY type of emergency or critical activity. ALWAYS consult official sources for important information !!!!</span>
+            <span class="font-medium">{m.visit_slash_locale()}<a href="/locale">/locale</a>.</span>
         </div>
     </div>
 {/if}
