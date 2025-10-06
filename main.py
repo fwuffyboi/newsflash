@@ -246,13 +246,6 @@ if __name__ == "__main__":
             logging.error("Latest log file not found.")
             return {"message": "Log file not found."}, 500
 
-    @app.route("/api/v1/news/bbc/")
-    async def get_bbc_news():
-        """
-        Endpoint to get the latest BBC news headlines.
-        :return : JSON response with the latest headlines and a 200 status code.
-        """
-        return get_headlines_bbc_news(BBC_NEWS_REGION, logging), 200
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
