@@ -187,8 +187,11 @@ if __name__ == "__main__":
             SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
             SPOTIFY_LANGUAGE, logging
         )
-        if not current_track_info:
-            return {"message": "User is not listening to anything or there was a spotify API error."}, 200
+        if current_track_info['error'] == "NPIF":
+            return {"error": "", "message": "User is not listening to anything."}, 200
+
+        elif current_track_info['error'] != "":
+            return {"error": current_track_info['error'], "message": "Unknown error"}, 500
 
         return current_track_info, 200
 
