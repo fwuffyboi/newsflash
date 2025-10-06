@@ -121,15 +121,10 @@ if __name__ == "__main__":
 
     @app.errorhandler(404)
     def not_found_error_flask(error):
-        if request.path.startswith('/api/'):
-            logging.error(error)
-            return {"message": "Resource not found"}, 404
-        else:
-            try:
-                return send_from_directory('./web', '404.html'), 404
-            except Exception as e:
-                logging.error("404.html not found in the web directory: %s", e)
-                return {"message": "Error.", "error": "404 error, however the server could not find 404.html to serve."}, 500
+        logging.error(error)
+        return {"message": "Resource not found"}, 404
+
+
     @app.route("/")
     async def root():
         return f"put docs here for api" # This is in HTML somehow
