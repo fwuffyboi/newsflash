@@ -11,7 +11,7 @@ def all_train_status_tfl(logger):
 
     url = "https://api.tfl.gov.uk/Line/Mode/tube/Status"
 
-    response = requests.get(url) # the tfl isn't a heaping pile of shit so its actually free and easy
+    response = requests.get(url) # tfl's api isn't a heaping pile of shit so its actually free and easy
 
     if response.status_code == 200:
 
