@@ -257,18 +257,24 @@ if __name__ == "__main__":
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
 
+        if not OPEN_WEATHER_ENABLED:
+            return {"error": "The OpenWeatherMap integration is disabled."}, 403
+
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
     
-        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging), 200
     
     @app.route("/api/v1/weather/forecast/")
     async def get_weather_forecast_flask():
 
+        if not OPEN_WEATHER_ENABLED:
+            return {"error": "The OpenWeatherMap integration is disabled."}, 403
+
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
        
-        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging), 200
 
     @app.route("/api/v1/weather/warnings/")
     async def get_weather_warnings_flask():
