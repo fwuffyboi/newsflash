@@ -14,7 +14,7 @@ def get_calendar_events_google(cal_url, logger):
     cal_req = requests.get(cal_url)
     if cal_req.status_code != 200:
         logger.error("Error getting calendar events from Google Calendar: {} - {}.".format(cal_req.status_code, cal_req.text[:40]))
-        return None
+        return {"error": f"Status code not 200. status code: {cal_req.status_code}", "next_events": None}
 
     cal = icalendar.Calendar.from_ical(cal_req.text)
 
@@ -46,7 +46,7 @@ def get_calendar_events_google(cal_url, logger):
                 }
             )
 
-        return next_events
+        return {"error": "", "next_events": next_events}
     except Exception as e:
-        logger.error("There was an error in get_calendar_events_google. Error: {}.".format(e))
-        return None
+        logger.error(f"There was an error in get_calendar_events_google. Error: {e}.")
+        return {"error": e, "next_events": None}
