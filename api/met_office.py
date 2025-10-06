@@ -45,7 +45,7 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
 
         logger.info(f"Found {len(warnings)} weather warnings from the Met Office for region \"{uk_region}\".")
 
-        return warnings
+        return {"error": "", "warnings": warnings}
     except Exception as e:
         logger.error(f"Error parsing Met Office weather warnings: {e}")
-        return None
+        return {"error": e, "warnings": []}
