@@ -303,24 +303,6 @@ if __name__ == "__main__":
         return caq, 200
 
 
-    @app.route("/api/v1/weather/current/tile/")
-    async def get_current_weather_tile():
-        # todo/feature&fix :3
-        return {"message": "This endpoint is not enabled yet due to still being in development."}, 501
-        if not OPEN_WEATHER_API_KEY:
-            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
-
-        if not LOCATION:
-            return {"error": "Please provide a location or set one in the .env file."}, 403
-
-        owm_tile_img = get_owm_tile("temp_new", LOCATION, OPEN_WEATHER_API_KEY, logging)
-        if not owm_tile_img:
-            return {"error": "owm_tile_img is none. This is likely an application error, or, an API error with OpenWeatherMap."}
-
-        # return image from the function above
-        return send_file(owm_tile_img, mimetype="image/png")
-
-
     @app.route("/api/v1/calendar/google")
     async def get_google_calendar_flask():
 
