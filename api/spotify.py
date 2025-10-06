@@ -46,14 +46,17 @@ def get_next_4_tracks_spotify(access_token, access_secret, spotify_language, log
         "device_type": playback['device']['type']
     })
 
-    queue_playback = sp.queue()
-    if not queue_playback:
-        logger.error("No queue playback information found.")
-        next_tracks = []
-    else:
-        next_tracks = [format_track(track) for track in queue_playback.get('queue', [])[:3]]
+    # queue_playback = sp.queue()
+    # if not queue_playback:
+    #     logger.warning("No queue playback information found.")
+    #     next_tracks = []
+    # else:
+    #     next_tracks = [format_track(track) for track in queue_playback.get('queue', [])[:3]]
 
     return {
-        "current_track": current_track_info,
-        "next_tracks": next_tracks
+        "error": "",
+        "data": {
+            "current_track": current_track_info,
+            # "next_tracks": next_tracks
+        }
     }
