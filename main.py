@@ -35,8 +35,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory, send_file, redirect
 from flask_cors import CORS
 
-from api.news_bbc import get_headlines_bbc_news
-from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, get_owm_tile
+from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 
