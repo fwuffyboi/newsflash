@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
     @app.route("/api/warnings/")
     async def api_warnings():
-        return APPLICATION_USER_WARNINGS
+        return APPLICATION_USER_WARNINGS, 200
 
     @app.route("/api/config/")
     async def api_config():
