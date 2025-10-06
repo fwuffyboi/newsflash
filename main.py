@@ -118,21 +118,34 @@ if __name__ == "__main__":
 
     @app.route("/api/config/")
     async def api_config():
-        enabled_apis = []
-        if OPEN_WEATHER_ENABLED == "true":
-            enabled_apis.append("owm")
-        if MET_OFFICE_WEATHER_WARNING_REGION not in ["NOTSET", "NOTUK"]:
-            enabled_apis.append("met-office-uk")
-        if BBC_NEWS_REGION != "":
-            enabled_apis.append("bbc-news")
-        if SPOTIFY_ENABLED == "true":
-            enabled_apis.append("spotify")
-        if TFL_TRAINS_ENABLED == "true":
-            enabled_apis.append("tfl-trains")
-        if TFL_BUSES_ENABLED == "true":
-            enabled_apis.append("tfl-buses")
-        if GOOGLE_CALENDAR_ICS_URL != "":
-            enabled_apis.append("g-cal")
+        try:
+            enabled_apis = []
+            if OPEN_WEATHER_ENABLED == "true":
+                enabled_apis.append("owm")
+            if MET_OFFICE_WEATHER_WARNING_REGION not in ["NOTSET", "NOTUK"]:
+                enabled_apis.append("met-office-uk")
+            if BBC_NEWS_REGION != "":
+                enabled_apis.append("bbc-news")
+            if SPOTIFY_ENABLED == "true":
+                enabled_apis.append("spotify")
+            if TFL_TRAINS_ENABLED == "true":
+                enabled_apis.append("tfl-trains")
+            if TFL_BUSES_ENABLED == "true":
+                enabled_apis.append("tfl-buses")
+            if GOOGLE_CALENDAR_ICS_URL != "":
+                enabled_apis.append("g-cal")
+
+            return {
+                "error": "",
+                "user_name": USERS_NAME,
+                "enabled_apis": enabled_apis
+            }
+        except Exception as e:
+            return {
+                "error": e,
+                "user_name": "",
+                "enabled_apis": []
+            }
 
         return {
             "user_name": USERS_NAME,
