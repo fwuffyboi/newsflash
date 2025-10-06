@@ -6,6 +6,7 @@ from operator import truediv
 from api.geocoding import geocodeLocation
 from api.google_calendar import get_calendar_events_google
 from api.met_office import GetCurrentWeatherWarningsMetOffice
+from api.spotify import get_next_4_tracks_spotify
 
 # Set up logging
 rootLogger = logging.getLogger()
