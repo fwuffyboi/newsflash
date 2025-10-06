@@ -278,13 +278,10 @@ if __name__ == "__main__":
 
         wa = GetCurrentWeatherWarningsMetOffice(MET_OFFICE_WEATHER_WARNING_REGION, logging)
 
-        if wa == []:
-            return {"message": "No weather warnings found."}, 200 # this prevents an error that happens when its empty list.
+        if wa['error']:
+            return {"error": f"Error occurred getting UK weather warnings for region {MET_OFFICE_WEATHER_WARNING_REGION}. Error: {wa['error']}"}, 500
 
-        if not wa:
-            return {"message": f"Unknown error occurred getting UK weather warnings for region {MET_OFFICE_WEATHER_WARNING_REGION}."}, 500
-
-        return wa
+        return wa, 200
 
 
     @app.route("/api/v1/air-quality/current/")
@@ -296,10 +293,10 @@ if __name__ == "__main__":
             return {"error": "Please provide a location or set one in the .env file."}, 403
 
         # take the response
-        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, OPEN_WEATHER_LANGUAGE, LOCATION, logging)
+        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
 
-        # No need to figure out the aqi rating here because it's done in the above function
-
+        if caq['error']:
+            return caq, 200
         return caq, 200
 
 
@@ -311,10 +308,9 @@ if __name__ == "__main__":
 
         cag = get_calendar_events_google(GOOGLE_CALENDAR_ICS_URL, logging)
 
-        if not cag:
-            return {"error": cag}, 500
-
-        return cag
+        if cag['error']:
+            return cag, 500
+        return cag, 200
 
 
     # Run the Flask app
