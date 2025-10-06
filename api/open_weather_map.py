@@ -25,7 +25,7 @@ def get_current_weather(api_key, location, language, logger):
     url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang={language}&lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
 
-    if response.status_code == 200: # yippee! it works :3
+    if response.status_code == 200:  # yippee! it works :3
         # # Add a "native_name" field to the response; this is the name of the location in the local language
         # native_name = None # default to None
         # country_code = response.json()['sys']['country']
@@ -103,12 +103,11 @@ def get_weather_forecast(api_key, location, language, logger):
             f"Error fetching weather forecast data. Status: {response.status_code} --- Response: {response.text}")
 
 
-def get_current_air_quality(api_key, lang, location, logger):
+def get_current_air_quality(api_key, location, logger):
     """
     Fetches the current air quality for a given location using the Google Air Quality API.
 
     :param api_key: OpenWeatherMap API key.
-    :param lang: The language to get the results in.
     :param location: The location for which to fetch the air quality. String or dict with 'latitude' and 'longitude'.
     :param logger:
     :return: A dictionary containing the current air quality data.
@@ -116,7 +115,7 @@ def get_current_air_quality(api_key, lang, location, logger):
 
     lat, lon, location_data = geocodeLocation(api_key, location, logger)
 
-    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lang={lang}&lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -124,27 +123,38 @@ def get_current_air_quality(api_key, lang, location, logger):
         # figure out the healthiness of the air
         rating, aqi = rate_air_quality(response.json(), logger)
         return {
-            "aqi_rating": rating,
-            "aqi": aqi,
-            "location": location,
-            "data": response.json()
+            "error": "",
+            "data": {
+                "aqi_rating": rating,
+                "aqi": aqi,
+                "location": location,
+                "raw_data": response.json()
+            }
         }
-    else:
-        logger.error("Error retrieving air quality. Error: {} - {}.".format(response.status_code, response.text))
-        return None
 
+    else:
+        logger.error(f"Error retrieving air quality. Error: {response.status_code} - {response.text}.")
+        return {
+            "error": f"{response.status_code} - {response.text}",
+            "data": {
+                "aqi_rating": 5,
+                "aqi": 5,
+                "location": location,
+                "raw_data": response.json()
+            }
+
+        }
 
 
 def rate_air_quality(air_response, logger):
     """Returns a worded rating based on the aqi value (e.g(s): Great!, Good, Moderate, Unhealthy, Hazardous"""
 
-    logger.info(air_response)
-
     aqi_no = air_response['list'][0]['main']['aqi']
 
     # Calculate the average aqi value
     if not aqi_no:
-        return {"error": "No air quality data available."}, 500
+        logger.warning("No air quality data available.")
+        return {"error": "No air quality data available.", "rating": "error"}, 500
 
     # Determine the air quality rating based on the average aqi value
     if 0 < aqi_no <= 1:  # if aqi is between 0 and 1
@@ -158,10 +168,10 @@ def rate_air_quality(air_response, logger):
     elif 4 < aqi_no <= 5:  # if aqi is between 4 and 5
         caq_rating = "Hazardous"
     else:  # if aqi is greater than 5
+        logger.error(f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.")
         return {
-            "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}."}
+            "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.",
+            "rating": "error"
+        }
 
-    return caq_rating, aqi_no
-
-
-
+    return {"error": "", "rating": caq_rating}
