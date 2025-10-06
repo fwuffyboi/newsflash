@@ -32,7 +32,7 @@ logging.info("NewsFlash logger started. Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
-from flask import Flask, request, send_from_directory, send_file
+from flask import Flask, request, send_from_directory, send_file, redirect
 from flask_cors import CORS
 
 from api.news_bbc import get_headlines_bbc_news
