@@ -210,7 +210,7 @@ if __name__ == "__main__":
     @app.route("/logs/")
     async def get_logs():
         # Find all log files in the current directory
-        log_files = [f for f in os.listdir('.') if f.startswith('newsflash-') and f.endswith('.log')]
+        log_files = [f for f in os.listdir('./logs') if f.startswith('newsflash-') and f.endswith('.log')]
         if not log_files:
             logging.error("No log files found.")
             return {"message": "No log files found."}, 500
@@ -229,10 +229,10 @@ if __name__ == "__main__":
 
         # Open the requested log file and return its contents as plain text
         try:
-            return send_from_directory('.', log_file_name, mimetype='text/plain'), 200
+            return send_from_directory('./logs', log_file_name, mimetype='text/plain'), 200
         except Exception as e:
             logging.error(f"Error reading log file {log_file_name}: {e}")
-            return {"message": f"Error reading log file {log_file_name}"}, 500
+            return {"error": f"Error reading log file {log_file_name}"}, 500
     
     @app.route("/logs/latest/")
     async def get_latest_logs():
@@ -241,11 +241,10 @@ if __name__ == "__main__":
         try:
             with open(logFileName, 'r') as file:
                 logs = file.readlines()
-            return logs[-2000:]  # Return the last 2000 lines of the log file as plain text
+            return logs[-2000:], 200  # Return the last 2000 lines of the log file as plain text
         except FileNotFoundError:
             logging.error("Latest log file not found.")
-            return {"message": "Log file not found."}, 500
-
+            return {"error": "Log file not found."}, 500
 
     @app.route("/api/v1/weather/current/")
     async def get_current_weather_flask():
