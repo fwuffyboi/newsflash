@@ -167,10 +167,6 @@ if __name__ == "__main__":
                 "enabled_apis": []
             }
 
-        return {
-            "user_name": USERS_NAME,
-            "enabled_apis": enabled_apis
-        }
 
     @app.route("/api/v1/spotify/now-playing/")
     async def get_current_track_spotify():
