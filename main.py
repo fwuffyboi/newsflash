@@ -3,6 +3,7 @@ import time
 import logging
 from operator import truediv
 
+from api.geocoding import geocodeLocation
 from api.google_calendar import get_calendar_events_google
 from api.met_office import GetCurrentWeatherWarningsMetOffice
 
@@ -81,6 +82,26 @@ if __name__ == "__main__":
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
+    logging.info("Geocoding user's location...")
+
+    # Geocode users location
+    if LOCATION == "OPTOUTLOC": # if user wishes to not give a location.
+        LOCATION_COORDS = [0, 0]
+        OPEN_WEATHER_ENABLED = False
+
+    else: # if user location is not OPTOUTLOC
+        LOCATION_COORDS = geocodeLocation(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        if LOCATION_COORDS['error'] != "" and LOCATION_COORDS['data'] == {}:
+            # This means the coords fucked up, stop the app and tell the user their location is messed.
+            logging.warning("Your location is likely not set correctly!!!")
+            logging.info("If you would not like to submit a location, please change it to \"OPTOUTLOC\". Weather integrations (excl. weather alerts) will not work.")
+            logging.error(f"LOCATION_COORDS ERROR: {LOCATION_COORDS['error']}")
+            logging.error(f"LOCATION_COORDS DATA: {LOCATION_COORDS['data']}")
+            logging.warning("Newsflash API shutting down NOW!!!")
+            sys.exit(1)
+        else:
+            logging.info(f"Your location \"{LOCATION}\" is set to LAT, LON: {LOCATION_COORDS['coords'][0]}, {LOCATION_COORDS['coords'][1]}")
+
     logging.info("Starting the Flask server!")
 
     # Application warnings go here for the user.
