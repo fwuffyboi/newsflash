@@ -16,8 +16,8 @@ def get_next_4_tracks_spotify(access_token, access_secret, spotify_language, log
 
     playback = sp.current_playback()
     if not playback:
-        logger.warn("No playback information found, user is likely not listening to anything. Playback: {}".format(playback))
-        return None
+        logger.warning(f"No playback information found, user is likely not listening to anything. Playback: {playback}")
+        return {'error': "NPIF", "message": f"No playback information found, user is likely not listening to anything. Playback: {playback}"}
 
     def format_track(track):
         artists = [artist['name'] for artist in track['artists']]
