@@ -182,9 +182,7 @@ if __name__ == "__main__":
         """
 
         if not SPOTIFY_ENABLED:
-            return {"message": "Spotify integration is disabled."}, 403
-
-        from api.spotify import get_next_4_tracks_spotify
+            return {"error": "", "message": "Spotify integration is disabled."}, 403
 
         if not SPOTIFY_ACCESS_TOKEN:
             return {"message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
