@@ -181,7 +181,7 @@ if __name__ == "__main__":
             return {"error": "", "message": "Spotify integration is disabled."}, 403
 
         if not SPOTIFY_ACCESS_TOKEN:
-            return {"message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
+            return {"error": "", "message": "Please set the SPOTIFY_ACCESS_TOKEN in the .env file."}, 403
 
         current_track_info = get_next_4_tracks_spotify(
             SPOTIFY_ACCESS_TOKEN, SPOTIFY_ACCESS_SECRET,
