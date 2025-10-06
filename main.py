@@ -12,7 +12,7 @@ rootLogger = logging.getLogger()
 # Set log file details, these will probably become .env variables someday, sooo... TODO
 logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
 logFileName = f'newsflash-{logFileTime}.log'
-logFilePath = "."
+logFilePath = "./logs"
 
 # Configure the logging format
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
