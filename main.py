@@ -55,11 +55,11 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Take variables from the .env file and set them here
-    LOCATION = os.getenv(             "LOCATION", "Kraków, Polska")  # Default to Kraków if not set
-
-    OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED", "false")  # Default to true if not set
-    OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY", "NOTSET")
+    OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED" , "false")  # Default to true if not set
+    OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY",  "NOTSET")
     OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
+
+    LOCATION = os.getenv("LOCATION") # This is only what's in the .env, don't use this for any functions
 
     MET_OFFICE_WEATHER_WARNING_REGION = os.getenv( "MET_OFFICE_WEATHER_WARNING_REGION", "NOTSET")
 
@@ -67,10 +67,10 @@ if __name__ == "__main__":
 
     BBC_NEWS_REGION = os.getenv(      "BBC_NEWS_REGION", "world")  # Default to "world" if not set
 
-    SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED", "false")  # Default to false if not set
-    SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN", "NOTSET")
+    SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED",       "false")  # Default to false if not set
+    SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN",  "NOTSET")
     SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET", "NOTSET")
-    SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE", "en-US")  # Default to "en-US" if not set
+    SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE",      "en-GB")  # Default to "en-GB" if not set
 
     TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
     TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
