@@ -24,7 +24,6 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     try:
         # Get the link to more details
         for entry in feed.entries:
-            print(entry)
             title = entry.title
             description = entry.description
             link = entry.link
