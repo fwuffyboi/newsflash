@@ -33,15 +33,15 @@ def all_train_status_tfl(logger):
 
             train_lines_data[train_line_name] = {"status_int": train_line_status, "status": train_line_status_description, "status_reason": train_line_disruption_reason}
 
-        return train_lines_data
+        return {"error": "", "data": train_lines_data}
     else:
         logger.error(f"Error fetching TFL train status. Status: {response.status_code} --- Response: {response.text}")
-        return None
+        return {"error": f"TFL Train status returned {response.status_code} and text: {response.text}", "data": {}}
 
 def get_set_bus_statuses_tfl(buses, logger):
     if not buses:
-        logger.error(f"No buses provided.")
-        return None
+        logger.warning(f"No buses provided.")
+        return {"error": "", "data": {}}
 
     url = "https://api.tfl.gov.uk/Line/Mode/bus/Status"
 
@@ -69,8 +69,8 @@ def get_set_bus_statuses_tfl(buses, logger):
                 else: # if not a match, skip the loop.
                     continue
 
-        return bus_statuses_data
+        return {"error": "", "data": bus_statuses_data}
 
     else:
         logger.error("Error fetching TFL bus statuses. Status: {} --- Response: {}".format(response.status_code, response.text))
-        return None
+        return {"error": f"TFL Bus status returned {response.status_code} and text: {response.text}", "data": {}}

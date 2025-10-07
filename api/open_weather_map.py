@@ -26,46 +26,39 @@ def get_current_weather(api_key, location, language, logger):
     response = requests.get(url)
 
     if response.status_code == 200:  # yippee! it works :3
-        # # Add a "native_name" field to the response; this is the name of the location in the local language
-        # native_name = None # default to None
-        # country_code = response.json()['sys']['country']
-        # country_code = country_code.lower()  # convert to lowercase
-
-        # try:
-        #     native_name = location_data[0]['local_names'][country_code]        
-        # except (IndexError, KeyError):
-        #     # If the native name is not found, set it to the English name
-        #     native_name = location_data[0]['name'] if 'name' in location_data[0] else None
-
         weather_data = response.json()
 
         return {
-            "location": {
-                "latitude": lat,
-                "longitude": lon,
-                "name": location_data[0]['name'],
-                # "native_name": native_name,  # add the native name
-                "country_code": location_data[0]['country'].upper()
-            },
-            "day": datetime.now().strftime("%A"),
-            "time": datetime.now().strftime("%I:%M"),
-            "format": 'metric',
-            "weather": {
-                "description": weather_data['weather'][0]['description'],
-                "temperature": weather_data['main']['temp'],
-                "humidity": weather_data['main']['humidity'],
-                "wind_speed": weather_data['wind']['speed'],
-                "pressure": weather_data['main']['pressure'],
-                "sunrise": weather_data['sys']['sunrise'],
-                "sunset": weather_data['sys']['sunset'],
-                "icon_url": f"https://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png",
-                "icon": weather_data['weather'][0]['icon']
+            "error": "",
+            "data": {
+                "location": {
+                    "latitude": lat,
+                    "longitude": lon,
+                    "name": location_data[0]['name'],
+                    "country_code": location_data[0]['country'].upper()
+                },
+                "day": datetime.now().strftime("%A"),
+                "time": datetime.now().strftime("%I:%M"),
+                "format": 'metric',
+                "weather": {
+                    "description": weather_data['weather'][0]['description'],
+                    "temperature": weather_data['main']['temp'],
+                    "humidity": weather_data['main']['humidity'],
+                    "wind_speed": weather_data['wind']['speed'],
+                    "pressure": weather_data['main']['pressure'],
+                    "sunrise": weather_data['sys']['sunrise'],
+                    "sunset": weather_data['sys']['sunset'],
+                    "icon_url": f"https://openweathermap.org/img/wn/{weather_data['weather'][0]['icon']}@2x.png",
+                    "icon": weather_data['weather'][0]['icon']
+                }
             }
         }
+
     else:
         logging.error(f"Error fetching weather data. Status: {response.status_code} --- Response: {response.text}")
         return {
-            "error": f"Error fetching weather data. Status: {response.status_code} --- Response: {response.text}"
+            "error": f"Error fetching weather data. Status: {response.status_code} --- Response: {response.text}",
+            "data": {}
         }
 
 
@@ -97,10 +90,12 @@ def get_weather_forecast(api_key, location, language, logger):
         # response_data = response.json()
         # response_data['location']['native_name'] = native_name  # add the native name to the response
 
-        return response.json()
+        return {"error": "", "data": response.json()}
     else:
-        raise Exception(
-            f"Error fetching weather forecast data. Status: {response.status_code} --- Response: {response.text}")
+        logger.error(f"Error fetching weather forecast data. Status: {response.status_code} --- Response: {response.text}")
+        return {"error": f"Error fetching weather forecast data. Status: {response.status_code} --- Response: {response.text}",
+                "data": {}
+        }
 
 
 def get_current_air_quality(api_key, location, logger):
@@ -122,6 +117,7 @@ def get_current_air_quality(api_key, location, logger):
 
         # figure out the healthiness of the air
         rating, aqi = rate_air_quality(response.json(), logger)
+
         return {
             "error": "",
             "data": {
@@ -136,12 +132,7 @@ def get_current_air_quality(api_key, location, logger):
         logger.error(f"Error retrieving air quality. Error: {response.status_code} - {response.text}.")
         return {
             "error": f"{response.status_code} - {response.text}",
-            "data": {
-                "aqi_rating": 5,
-                "aqi": 5,
-                "location": location,
-                "raw_data": response.json()
-            }
+            "data": {}
 
         }
 

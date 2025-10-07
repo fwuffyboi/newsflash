@@ -1,7 +1,6 @@
 import os, sys
 import time
 import logging
-from operator import truediv
 
 from api.geocoding import geocodeLocation
 from api.google_calendar import get_calendar_events_google
@@ -207,13 +206,13 @@ if __name__ == "__main__":
         """
 
         if TFL_TRAINS_ENABLED == "false":
-            return {"message": "TFL train statuses are disabled."}, 200
+            return {"message": "TFL train statuses are disabled."}, 403
 
         train_status = all_train_status_tfl(logging)
-        if not train_status:
-            return {"message": "No train status data available. Please check the logs for more information."}, 204
+        if train_status['error']:
+            return {"error": "No train status data available. Please check the logs for more information.", "data": {}}, 500
 
-        return train_status, 200
+        return {"error": "", "data":train_status['data']}, 200
 
 
     @app.route("/api/v1/transport/tfl/bus-status/")
@@ -224,19 +223,19 @@ if __name__ == "__main__":
         :return:
         """
 
-        if TFL_BUSES_ENABLED == "true":
-            resp = get_set_bus_statuses_tfl(TFL_BUS_ROUTES, logging)
-            if not resp:
-                return {"message": "TFL bus statuses are not available."}, 404
+        if TFL_BUSES_ENABLED == "false":
+            return {"message": "TFL train statuses are disabled."}, 403
 
-            return resp, 200
+        resp = get_set_bus_statuses_tfl(TFL_BUS_ROUTES, logging)
+        if resp['error']:
+            return {"message": "TFL bus statuses are not available."}, 404
 
-        return {"message": "TFL bus statuses are not enabled."}, 404
+        return {"error": "", "data": resp['data']}, 200
 
 
     @app.route("/ping/")
     async def ping():
-        return {"message": "pong!"}
+        return {"message": "pong"}
 
     # logging routes
     @app.route("/logs/")
@@ -286,8 +285,12 @@ if __name__ == "__main__":
 
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
-    
-        return get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging), 200
+
+        resp = get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+
+        if resp["error"]:
+            return {"error": "Could not get current weather data. Please check the logs.", "data": {}}
+        return {"error": "", "data": resp["data"]}
     
     @app.route("/api/v1/weather/forecast/")
     async def get_weather_forecast_flask():
@@ -297,8 +300,13 @@ if __name__ == "__main__":
 
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
-       
-        return get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging), 200
+
+        resp = get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+
+        if resp["error"]:
+            return {"error": "Could not get forecasted weather data. Please check the logs.", "data": {}}
+        return {"error": "", "data": resp["data"]}, 200
+
 
     @app.route("/api/v1/weather/warnings/")
     async def get_weather_warnings_flask():
