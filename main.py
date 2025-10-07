@@ -78,11 +78,11 @@ if __name__ == "__main__":
     SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE",      "en-GB")  # Default to "en-GB" if not set
 
     TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
-    TFL_BUSES_ENABLED = os.getenv(   "TFL_BUSES_ENABLED", "true")
+    TFL_BUSES_ENABLED = os.getenv(    "TFL_BUSES_ENABLED", "true")
 
-    TFL_BUS_ROUTES = os.getenv(           "TFL_BUSES", "18,25,29,140,149,243,207")
+    TFL_BUS_ROUTES = os.getenv(       "TFL_BUSES", "18,25,29,140,149,243,207")
 
-    GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL", "DISABLED")
+    GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL", "")
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
