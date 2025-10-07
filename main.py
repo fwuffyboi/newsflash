@@ -286,7 +286,7 @@ if __name__ == "__main__":
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
 
-        resp = get_current_weather(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+        resp = get_current_weather(OPEN_WEATHER_API_KEY, LOCATION_COORDS, OPEN_WEATHER_LANGUAGE, logging)
 
         if resp["error"]:
             return {"error": "Could not get current weather data. Please check the logs.", "data": {}}
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         if not OPEN_WEATHER_API_KEY:
             return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
 
-        resp = get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION, OPEN_WEATHER_LANGUAGE, logging)
+        resp = get_weather_forecast(OPEN_WEATHER_API_KEY, LOCATION_COORDS, OPEN_WEATHER_LANGUAGE, logging)
 
         if resp["error"]:
             return {"error": "Could not get forecasted weather data. Please check the logs.", "data": {}}
@@ -331,7 +331,7 @@ if __name__ == "__main__":
             return {"error": "Please provide a location or set one in the .env file."}, 403
 
         # take the response
-        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION, logging)
+        caq = get_current_air_quality(OPEN_WEATHER_API_KEY, LOCATION_COORDS, logging)
 
         if caq['error']:
             return caq, 200

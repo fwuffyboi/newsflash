@@ -1,10 +1,8 @@
 # this file has all google api integrations in it.
 import logging
 from datetime import datetime
-from io import BytesIO
 
 import requests
-from PIL import Image
 
 from api.geocoding import geocodeLocation
 
@@ -20,9 +18,9 @@ def get_current_weather(api_key, location, language, logger):
     :return: A dictionary containing the current weather data.
     """
 
-    lat, lon, location_data = geocodeLocation(api_key, location, logger)
+    ld = location
 
-    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang={language}&lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang={language}&lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:  # yippee! it works :3
@@ -32,10 +30,10 @@ def get_current_weather(api_key, location, language, logger):
             "error": "",
             "data": {
                 "location": {
-                    "latitude": lat,
-                    "longitude": lon,
-                    "name": location_data[0]['name'],
-                    "country_code": location_data[0]['country'].upper()
+                    "latitude": ld['coords'][0],
+                    "longitude": ld['coords'][1],
+                    "name": ld['data'][0]['name'],
+                    "country_code": ld['data'][0]['country'].upper()
                 },
                 "day": datetime.now().strftime("%A"),
                 "time": datetime.now().strftime("%I:%M"),
@@ -73,9 +71,9 @@ def get_weather_forecast(api_key, location, language, logger):
     :return: A dictionary containing the weather forecast data.
     """
 
-    lat, lon, location_data = geocodeLocation(api_key, location, logger)
+    ld = location
 
-    url = f"https://api.openweathermap.org/data/2.5/forecast?units=metric&lang={language}&lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/forecast?units=metric&lang={language}&lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
         # Add a "native_name" field to the response; this is the name of the location in the local language
@@ -108,21 +106,21 @@ def get_current_air_quality(api_key, location, logger):
     :return: A dictionary containing the current air quality data.
     """
 
-    lat, lon, location_data = geocodeLocation(api_key, location, logger)
+    ld = location
 
-    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:
 
         # figure out the healthiness of the air
-        rating, aqi = rate_air_quality(response.json(), logger)
+        # rating, aqi = rate_air_quality(response.json(), logger)
 
         return {
             "error": "",
             "data": {
-                "aqi_rating": rating,
-                "aqi": aqi,
+                # "aqi_rating": rating,
+                "aqi": response.json()['list'][0]['main']['aqi'],
                 "location": location,
                 "raw_data": response.json()
             }
