@@ -57,6 +57,10 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Take variables from the .env file and set them here
+
+    HOST = os.getenv("HOST", "0.0.0.0")
+    PORT = int(os.getenv("PORT", "8080")) # convert to int on the fly
+
     OPEN_WEATHER_ENABLED = os.getenv( "OPEN_WEATHER_ENABLED" , "false")  # Default to true if not set
     OPEN_WEATHER_API_KEY = os.getenv( "OPEN_WEATHER_API_KEY",  "NOTSET")
     OPEN_WEATHER_LANGUAGE = os.getenv("OPEN_WEATHER_LANGUAGE", "en")  # Default to "en" if not set
@@ -340,9 +344,6 @@ if __name__ == "__main__":
 
 
     # Run the Flask app
-    HOST = "0.0.0.0"
-    PORT = 8080
-
     logging.info(f"Running NewsFlash Server on {HOST}:{PORT}...")
 
     Flask.run(app, HOST, PORT, debug=True)
