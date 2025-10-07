@@ -135,32 +135,32 @@ def get_current_air_quality(api_key, location, logger):
         }
 
 
-def rate_air_quality(air_response, logger):
-    """Returns a worded rating based on the aqi value (e.g(s): Great!, Good, Moderate, Unhealthy, Hazardous"""
-
-    aqi_no = air_response['list'][0]['main']['aqi']
-
-    # Calculate the average aqi value
-    if not aqi_no:
-        logger.warning("No air quality data available.")
-        return {"error": "No air quality data available.", "rating": "error"}, 500
-
-    # Determine the air quality rating based on the average aqi value
-    if 0 < aqi_no <= 1:  # if aqi is between 0 and 1
-        caq_rating = "Great!"
-    elif 1 < aqi_no <= 2:  # if aqi is between 1 and 2
-        caq_rating = "Good"
-    elif 2 < aqi_no <= 3:  # if aqi is between 2 and 3
-        caq_rating = "Moderate"
-    elif 3 < aqi_no <= 4:  # if aqi is between 3 and 4
-        caq_rating = "Unhealthy"
-    elif 4 < aqi_no <= 5:  # if aqi is between 4 and 5
-        caq_rating = "Hazardous"
-    else:  # if aqi is greater than 5
-        logger.error(f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.")
-        return {
-            "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.",
-            "rating": "error"
-        }
-
-    return {"error": "", "rating": caq_rating}
+# def rate_air_quality(air_response, logger):
+#     """Returns a worded rating based on the aqi value (e.g(s): Great!, Good, Moderate, Unhealthy, Hazardous"""
+#
+#     aqi_no = air_response['list'][0]['main']['aqi']
+#
+#     # Calculate the average aqi value
+#     if not aqi_no:
+#         logger.warning("No air quality data available.")
+#         return {"error": "No air quality data available.", "rating": "error"}, 500
+#
+#     # Determine the air quality rating based on the average aqi value
+#     if 0 < aqi_no <= 1:  # if aqi is between 0 and 1
+#         caq_rating = "Great!"
+#     elif 1 < aqi_no <= 2:  # if aqi is between 1 and 2
+#         caq_rating = "Good"
+#     elif 2 < aqi_no <= 3:  # if aqi is between 2 and 3
+#         caq_rating = "Moderate"
+#     elif 3 < aqi_no <= 4:  # if aqi is between 3 and 4
+#         caq_rating = "Unhealthy"
+#     elif 4 < aqi_no <= 5:  # if aqi is between 4 and 5
+#         caq_rating = "Hazardous"
+#     else:  # if aqi is greater than 5
+#         logger.error(f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.")
+#         return {
+#             "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.",
+#             "rating": "error"
+#         }
+#
+#     return {"error": "", "rating": caq_rating}
