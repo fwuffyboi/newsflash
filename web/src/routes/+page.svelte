@@ -28,15 +28,14 @@
         "progress_ms": 0,
         "is_playing":  false,
         "id":          "",
-        "link":        "",
+        "link":        ""
 
-        "queue":       {}
+        // "queue":       {}
     };
 
     onMount(() => {
         const updateTime = () => {
-            const now = new Date();
-            time = now.toLocaleTimeString([], { hour12: false });
+            time = (new Date).toLocaleTimeString([], { hour12: false });
         };
 
         updateTime();
@@ -57,7 +56,7 @@
 
         // here, check what apis are enabled and store it, as well as the main user's name
         try {
-            fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(5000) })
+            fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(3000) })
                 .then(response => response.json())
                 .then(data => {
                     console.log("dnata", data);
