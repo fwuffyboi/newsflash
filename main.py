@@ -77,10 +77,9 @@ if __name__ == "__main__":
     SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET", "NOTSET")
     SPOTIFY_LANGUAGE = os.getenv(     "SPOTIFY_LANGUAGE",      "en-GB")  # Default to "en-GB" if not set
 
-    TFL_TRAINS_ENABLED = os.getenv(   "TFL_TRAINS_ENABLED", "true")
-    TFL_BUSES_ENABLED = os.getenv(    "TFL_BUSES_ENABLED", "true")
-
-    TFL_BUS_ROUTES = os.getenv(       "TFL_BUSES", "18,25,29,140,149,243,207")
+    TFL_TRAINS_ENABLED = os.getenv("TFL_TRAINS_ENABLED", "true")
+    TFL_BUSES_ENABLED = os.getenv( "TFL_BUSES_ENABLED", "true")
+    TFL_BUS_ROUTES = os.getenv(    "TFL_BUS_ROUTES", "18,25,29,140,149,243,207")
 
     GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL", "")
 
