@@ -63,7 +63,7 @@ def get_set_bus_statuses_tfl(buses, logger):
                     if bus_status_no != 10:
                         bus_status_reason = response[line_no]['lineStatuses'][0]['reason']
                     else:
-                        bus_status_reason = "Good status!"
+                        bus_status_reason = "Good status."
 
                     bus_statuses_data.append({"bus_name": bus_name, "status_int": bus_status_no, "status": bus_status_reason})
                 else: # if not a match, skip the loop.

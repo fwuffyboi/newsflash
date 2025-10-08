@@ -7,7 +7,6 @@
     import CurrentWeather from "../components/CurrentWeather.svelte";
     import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
     import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
-    import BBCNews from "../components/BBCNews.svelte";
 
     let time: string = 'LOADING....';
     let activity = true;
