@@ -29,15 +29,15 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                desc = data.weather.description;
-                loc = data.location.name;
-                humidity = data.weather.humidity;
-                sunrise = data.weather.sunrise;
-                sunset = data.weather.sunset;
-                temp = data.weather.temperature;
-                wind = data.weather.wind_speed;
-                icon = data.weather.icon;
-                units = 'metric'
+                desc =     data.data.weather.description;
+                loc =      data.data.location.name;
+                humidity = data.data.weather.humidity;
+                sunrise =  data.data.weather.sunrise;
+                sunset =   data.data.weather.sunset;
+                temp =     data.data.weather.temperature;
+                wind =     data.data.weather.wind_speed;
+                icon =     data.data.weather.icon;
+                units =    'metric'
 
                 // process weather data
                 desc = desc[0].toUpperCase() + desc.slice(1); // uppercase first letter :3

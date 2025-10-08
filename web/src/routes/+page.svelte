@@ -120,49 +120,49 @@
                     console.log(data);
 
                     // Create a temp list var for the queue and each track in it
-                    let spotifyQueueItem;
-                    let spotifyQueueList = {};
+                    // let spotifyQueueItem;
+                    // let spotifyQueueList = {};
 
                     // check if the user has any playback
-                    if (data.message == "User is not listening to anything or there was a spotify API error.") {
+                    if (data.error == "NPIF") {
 
                         // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
                         spotifyFixedData = {
                             "title":       "Nothing is playing right now...",
                             "album":       "",
                             "artists":     "",
-                            "cover":       "/blank_album_spotify.png",
+                            "cover":       "bleeehhh this isnt used anymore but keep it for reasons bleeehhh",
                             "device_name": "",
                             "device_type": "",
                             "duration_ms": 0,
                             "progress_ms": 0,
                             "is_playing":  false,
                             "id":          "",
-                            "link":        "",
+                            "link":        ""
 
-                            "queue": {}
+                            // "queue": {}
                         };
 
 
                     } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
-                        for (spotifyQueueItem in data.next_tracks) {
-                            spotifyQueueList += data.next_tracks[spotifyQueueItem];
-                        }
+                        // for (spotifyQueueItem in data.next_tracks) {
+                        //     spotifyQueueList += data.next_tracks[spotifyQueueItem];
+                        // }
 
                         spotifyFixedData = {
-                            "title":       data.current_track.track_name,
-                            "album":       data.current_track.album,
-                            "artists":     data.current_track.artists,
-                            "cover":       data.current_track.cover,
-                            "device_name": data.current_track.device,
-                            "device_type": data.current_track.device_type,
-                            "duration_ms": data.current_track.duration_ms,
-                            "progress_ms": data.current_track.progress_ms,
-                            "is_playing":  data.current_track.is_playing,
-                            "id":          data.current_track.id,
-                            "link":        data.current_track.link,
+                            "title":       data.data.current_track.track_name,
+                            "album":       data.data.current_track.album,
+                            "artists":     data.data.current_track.artists,
+                            "cover":       data.data.current_track.cover,
+                            "device_name": data.data.current_track.device,
+                            "device_type": data.data.current_track.device_type,
+                            "duration_ms": data.data.current_track.duration_ms,
+                            "progress_ms": data.data.current_track.progress_ms,
+                            "is_playing":  data.data.current_track.is_playing,
+                            "id":          data.data.current_track.id,
+                            "link":        data.data.current_track.link
 
-                            "queue":       spotifyQueueList
+                            // "queue":       spotifyQueueList
                         };
                         console.log(spotifyFixedData)
                     }

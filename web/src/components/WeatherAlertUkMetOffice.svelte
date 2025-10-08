@@ -11,9 +11,9 @@
                 console.log(data);
 
                 // check if not empty
-                if (data.length !== 0 && !data.message) {
-                    weatherAlerts.set(data)
-                    for (const element of data) {
+                if (data.warnings.length !== 0) {
+                    weatherAlerts.set(data.warnings);
+                    for (const element of data.warnings) {
                         weather_alerts.push({
                             'title': element.title,
                             'desc':  element.desc,
