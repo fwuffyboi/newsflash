@@ -7,17 +7,17 @@
 
     onMount(() => {
         // Draw the datamatrix barcode after the canvas is mounted
-        try {
-            bwipjs.toCanvas("qrcanvas", {
-                bcid:        'datamatrix',
-                text:        songURL,
-                scale:       5,
-                height:      5,
-                width:       5
-            });
-        } catch (e) {
-            console.error("bwipjs error:", e);
-        }
+        // try {
+        //     bwipjs.toCanvas("qrcanvas", {
+        //         bcid:        'datamatrix',
+        //         text:        songURL,
+        //         scale:       5,
+        //         height:      5,
+        //         width:       5
+        //     });
+        // } catch (e) {
+        //     console.error("bwipjs error:", e);
+        // }
     })
 
 </script>
