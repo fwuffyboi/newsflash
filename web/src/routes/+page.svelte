@@ -38,9 +38,6 @@
             time = (new Date).toLocaleTimeString([], { hour12: false });
         };
 
-        updateTime();
-        pingMirrorAPI();
-
         // Draw the datamatrix barcode after the canvas is mounted
         try {
             bwipjs.toCanvas("dmcanvas", {
@@ -71,18 +68,20 @@
             WebUIHalt = "WebUI HALTED. Network error! - Could not access /api/config on startup/page reload.";
         }
 
+        updateTime();
+        pingMirrorAPI();
 
         if ("spotify" in enabled_apis) {
             getSpotifyNowPlayingData();
         }
 
-        const timeInterval = setInterval(updateTime, 200);
-        const activityInterval = setInterval(pingMirrorAPI, 3000);
+        const timeInterval = setInterval(updateTime, 300);
+        const pingInterval = setInterval(pingMirrorAPI, 3000);
         const SpotifyInterval = setInterval(getSpotifyNowPlayingData, 3000);
 
         return () => {
             clearInterval(timeInterval);
-            clearInterval(activityInterval);
+            clearInterval(pingInterval);
             if ('spotify' in enabled_apis) {
                 clearInterval(SpotifyInterval);
             }
@@ -171,7 +170,7 @@
 
     }
 
-    const VERSION = "ALPHA-0.1.0";
+    const VERSION = "ALPHA-0.4.0";
     const pageTitle = "NewsFlash Application"
 
 </script>
