@@ -36,7 +36,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory, send_file, redirect
 from flask_cors import CORS
 
-from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality
+from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, \
+    get_weather_forecast_simple
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 
@@ -304,6 +305,22 @@ if __name__ == "__main__":
 
         if resp["error"]:
             return {"error": "Could not get forecasted weather data. Please check the logs.", "data": {}}
+        return {"error": "", "data": resp["data"]}, 200
+
+
+    @app.route("/api/v1/weather/forecast/simple/")
+    async def get_weather_forecast_simple_flask():
+
+        if not OPEN_WEATHER_ENABLED:
+            return {"error": "The OpenWeatherMap integration is disabled."}, 403
+
+        if not OPEN_WEATHER_API_KEY:
+            return {"error": "Please set the OPEN_WEATHER_API_KEY in the .env file."}, 403
+
+        resp = get_weather_forecast_simple(OPEN_WEATHER_API_KEY, LOCATION_COORDS, OPEN_WEATHER_LANGUAGE, logging)
+
+        if resp["error"]:
+            return {"error": "Could not get simple forecasted weather data. Please check the logs.", "data": {}}
         return {"error": "", "data": resp["data"]}, 200
 
 
