@@ -1,10 +1,8 @@
 # this file has all google api integrations in it.
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import requests
-
-from api.geocoding import geocodeLocation
 
 
 def get_current_weather(api_key, location, language, logger):
@@ -76,18 +74,6 @@ def get_weather_forecast(api_key, location, language, logger):
     url = f"https://api.openweathermap.org/data/2.5/forecast?units=metric&lang={language}&lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
-        # Add a "native_name" field to the response; this is the name of the location in the local language
-        # native_name = None  # default to None
-        # country_code = location_data[0]['country']
-        # country_code = country_code.lower()  # convert to lowercase
-        # try:
-        #     native_name = location_data['results'][0]['local_names'][country_code]
-        # except (IndexError, KeyError):
-        #     # If the native name is not found, set it to the English name
-        #     native_name = location_data['results'][0]['formatted_address'] if 'formatted_address' in location_data['results'][0] else None
-        # response_data = response.json()
-        # response_data['location']['native_name'] = native_name  # add the native name to the response
-
         return {"error": "", "data": response.json()}
     else:
         logger.error(f"Error fetching weather forecast data. Status: {response.status_code} --- Response: {response.text}")
