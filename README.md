@@ -15,7 +15,8 @@ While it *will* work for users outside the _**UK**_, some features _(such as wea
 only the _**UK**_ and/or _**London**_.
 
 ### Todo (in order of importance)
-- [ ] Improve error logging. Make errors be returned to users in a simplistic manner.
+- [x] Improve error logging. Make errors be returned to users in a simplistic manner
+- [ ] Force log file size limit to prevent storage issues
 - [ ] Cache Openweathermap results
 - [ ] Weather maps (https://openweathermap.org/api/weathermaps)
 
