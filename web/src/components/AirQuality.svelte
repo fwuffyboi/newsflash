@@ -18,19 +18,19 @@
                 if ([1,2,3,4,5].includes(aqi)) {
                     if (aqi === 1) {
                         bg_gradient = 'from-green-400 to-green-600';
-                        message = m.great_air_quality();
+                        message = m.aqi_great_air_quality();
                     } else if (aqi === 2) {
-                        bg_gradient = 'from-green-400 to-yellow-400';
-                        message = m.good_air_quality();
+                        bg_gradient = 'from-green-400 to-yellow-300';
+                        message = m.aqi_good_air_quality();
                     } else if (aqi === 3) {
                         bg_gradient = 'bg-amber-600';
-                        message = m.moderate_air_quality();
+                        message = m.aqi_moderate_air_quality();
                     } else if (aqi === 4) {
                         bg_gradient = 'from-orange-400 to-amber-800';
-                        message = m.bad_air_quality();
+                        message = m.aqi_bad_air_quality();
                     } else if (aqi === 5) {
                         bg_gradient = 'from-orange-500 to-red-600';
-                        message = m.hazardous_air_quality();
+                        message = m.aqi_hazardous_air_quality();
                     }
                 } else {
                     bg_gradient = 'from-gray-400 to-gray-600';

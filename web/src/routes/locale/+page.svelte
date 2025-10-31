@@ -5,12 +5,12 @@
 
 <div class="flex flex-col bg-white w-screen h-screen items-center">
     <span class="text-3xl mt-40 italic">{m.locale_changed({ locale: getLocale() })}</span>
-    <span class="font-bold text-lg">{m.choose_locale({})}</span>
-    <div class="flex flex-col gap-2">
-        <button onclick={() => setLocale('en')}>en</button>
-        <button onclick={() => setLocale('ru')}>ru</button>
-        <button onclick={() => setLocale('pl')}>pl</button>
-        <button onclick={() => setLocale('ie')}>ie</button>
+    <span class="font-bold text-lg">{m.locale_choose({})}</span>
+    <div class="flex flex-col gap-2 underline">
+        <button onclick={() => setLocale('en')}>English</button>
+        <button onclick={() => setLocale('ru')}>Русский</button>
+        <button onclick={() => setLocale('pl')}>Polski</button>
+        <button onclick={() => setLocale('ie')}>Gaeilge</button>
     </div>
-    <span class="font-medium">{m.back_to_main_page_locale()}<a href="/">__/__</a>.</span>
+    <span class="font-medium">{m.locale_back_home()}<a href="/">__/__</a>.</span>
 </div>

@@ -4,11 +4,13 @@
         CloudDrizzle, CloudSnow, CloudFog, CloudAlert,
         Droplet, Wind, Sunrise, Sunset, TriangleAlert
     } from "lucide-svelte";
+    import { m } from '$lib/paraglide/messages.js'; // i18n
     import AirQuality from "./AirQuality.svelte";
     import { weatherAlerts } from '../stores/weatherAlerts';
     let alerts = $state($weatherAlerts);
 
     import {onMount} from "svelte";
+    import {getLocale} from "$lib/paraglide/runtime.js";
 
     let desc =       $state("Loading...");
     let loc =        $state("Loading...");
@@ -19,7 +21,7 @@
     let temp_str =   $state('??');
     let wind =       $state(7.77);
     let icon =       $state("01d");
-    let units =      $state("Unknown");
+    let unit =      $state("Unknown");
 
     let bg_gradient = $state("")
     let lucide_icon = $state("")
@@ -37,7 +39,7 @@
                 temp =     data.data.weather.temperature;
                 wind =     data.data.weather.wind_speed;
                 icon =     data.data.weather.icon;
-                units =    'metric'
+                unit =    'metric'
 
                 // process weather data
                 desc = desc[0].toUpperCase() + desc.slice(1); // uppercase first letter :3
@@ -106,7 +108,7 @@
                 {#if lucide_icon === "cloud_err"}
                     <CloudAlert size="30"/>
                 {/if}
-                <span class="italic text-gray-100 pl-2">Current weather in</span>
+                <span class="italic text-gray-100 pl-2">{m.weather_current_weather_in()}</span>
             </div>
             <div class="flex flex-row gap-2">
                 <span class="font-bold text-xl">{loc}</span>
@@ -139,7 +141,7 @@
                     <span class="pl-1">{wind}</span>
                 </div>
             </div>
-            <div class="text-gray-200"><span>All units in {units}</span></div>
+            <div class="text-gray-200"><span>{m.weather_all_units_in({ units: unit })}</span></div>
         </div>
 
     </div>
@@ -160,7 +162,7 @@
     <!-- Embed other air quality component-->
     <AirQuality />
     <div class="flex flex-row gap-1 pt-1 pl-1">
-        <span class="text-gray-300">Last updated: </span>
+        <span class="text-gray-300">{m.weather_last_updated()}</span>
         <span class="text-gray-300">{new Date().toLocaleTimeString([], { hour12: false }).toString().substring(0,5)}</span>
     </div>
 

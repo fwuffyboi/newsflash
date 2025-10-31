@@ -8,6 +8,7 @@
     import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
     import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
     import ICalendar from "../components/ICalendar.svelte";
+    import {getLocale} from "$lib/paraglide/runtime";
 
     let time: string = 'LOADING....';
     let activity = true;
@@ -245,8 +246,8 @@
 {#if activity}
     <div class="text-right text-white fixed bottom-0 right-1.5 mb-0 w-190">
         <div class="flex flex-col italic font-thin tracking-tighter animate-pulse">
-            <span class="font-bold">!!!! DISCLAIMER: All information displayed is for informational purposes only. Do not rely on this device's information for ANY type of emergency or critical activity. ALWAYS consult official sources for important information !!!!</span>
-            <span class="font-medium">{m.visit_slash_locale()}<a href="/locale">/locale</a>.</span>
+            <span class="font-bold">!!!! {m.disclaimer()} !!!!</span>
+            <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
         </div>
     </div>
 {/if}

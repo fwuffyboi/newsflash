@@ -1,6 +1,7 @@
 <script>
 
     import {onMount} from "svelte";
+    import {m} from "$lib/paraglide/messages.js"
     import bwipjs from '@bwip-js/browser';
 
     let { songName = "Loading..", songArtists = "Loading..", albumName = "Loading..", albumImg, songURL, nowPlaying = true} = $props();
@@ -26,7 +27,7 @@
 {#if songName === "Nothing is playing right now..." || !nowPlaying }
     <section class="h-12 flex flex-row">
         <div class="flex flex-col pr-4 text-gray-200 text-right">
-            <span class="font-bold text-4xl italic tracking-tight animate-pulse line-clamp-3">Nothing's playing...</span>
+            <span class="font-bold text-4xl italic tracking-tight animate-pulse line-clamp-3">{m.spotify_nothing_is_playing()}</span>
         </div>
     </section>
 {/if}
