@@ -20,3 +20,8 @@ only the _**UK**_ and/or _**London**_.
 - [ ] Cache Openweathermap results
 - [ ] Weather maps (https://openweathermap.org/api/weathermaps)
 
+### Copyright disclaimer
+The content featured in this application is copyrighted by other sources including but not limited to;
+ - the Government of the United Kingdom
+ - the Met Office
+ - Spotify AB
