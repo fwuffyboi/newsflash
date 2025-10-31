@@ -53,7 +53,7 @@
                 }
 
                 else if (["03d", "03n", "04d", "04n"].includes(icon)) {
-                    if (temp>=16) {
+                    if (temp>=22) { // if temp higher or == to 22, show sun
                         bg_gradient = "from-yellow-400 to-amber-600 bg-linear-150";lucide_icon='sun'
                     } else {
                         bg_gradient = "from-gray-400 to-gray-600 bg-linear-150";lucide_icon = 'cloud'
