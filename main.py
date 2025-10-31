@@ -71,8 +71,6 @@ if __name__ == "__main__":
 
     USERS_NAME = os.getenv(           "USERS_NAME", "User")  # Default to "User" if not set
 
-    BBC_NEWS_REGION = os.getenv(      "BBC_NEWS_REGION", "world")  # Default to "world" if not set
-
     SPOTIFY_ENABLED = os.getenv(      "SPOTIFY_ENABLED",       "false")  # Default to false if not set
     SPOTIFY_ACCESS_TOKEN = os.getenv( "SPOTIFY_ACCESS_TOKEN",  "NOTSET")
     SPOTIFY_ACCESS_SECRET = os.getenv("SPOTIFY_ACCESS_SECRET", "NOTSET")
@@ -147,8 +145,6 @@ if __name__ == "__main__":
                 enabled_apis.append("owm")
             if MET_OFFICE_WEATHER_WARNING_REGION not in ["NOTSET", "NOTUK"]:
                 enabled_apis.append("met-office-uk")
-            if BBC_NEWS_REGION != "":
-                enabled_apis.append("bbc-news")
             if SPOTIFY_ENABLED == "true":
                 enabled_apis.append("spotify")
             if TFL_TRAINS_ENABLED == "true":
