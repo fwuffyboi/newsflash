@@ -7,6 +7,7 @@
     import CurrentWeather from "../components/CurrentWeather.svelte";
     import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
     import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
+    import ICalendar from "../components/ICalendar.svelte";
 
     let time: string = 'LOADING....';
     let activity = true;
@@ -222,6 +223,9 @@
                 </div>
             {#if enabled_apis.includes('met-office-uk')}
                 <WeatherAlertUkMetOfficeUkMetOffice />
+            {/if}
+            {#if enabled_apis.includes('ical')}
+                <ICalendar />
             {/if}
         </section>
     {/if}

@@ -5,15 +5,15 @@
 import requests
 import icalendar
 import recurring_ical_events
-from datetime import datetime, timezone, time, timedelta
+from datetime import datetime, time, timedelta
 
 
-def get_calendar_events_google(cal_url, logger):
+def get_calendar_events(cal_url, logger):
     # Parse the URL
 
     cal_req = requests.get(cal_url)
     if cal_req.status_code != 200:
-        logger.error("Error getting calendar events from Google Calendar: {} - {}.".format(cal_req.status_code, cal_req.text[:40]))
+        logger.error("Error getting calendar events from ICalendar URL: {} - {}.".format(cal_req.status_code, cal_req.text[:40]))
         return {"error": f"Status code not 200. status code: {cal_req.status_code}", "next_events": None}
 
     cal = icalendar.Calendar.from_ical(cal_req.text)
@@ -35,18 +35,24 @@ def get_calendar_events_google(cal_url, logger):
             else:
                 duration = str(event["DTEND"].dt - event["DTSTART"].dt)
 
+            # calculate hasEnded (thank you chatgpt)
+            has_ended = (event["DTEND"].dt
+                         if isinstance(event["DTEND"].dt, datetime)  # timed event
+                         else datetime.combine(event["DTEND"].dt, time.min, tzinfo=local_tz)) <= datetime.now(tz=local_tz)
+
             next_events.append(
                 {
                     "title": str(event.get("SUMMARY", "")),
                     "desc":  str(event.get("DESCRIPTION", "")),
-                    "start": str(event["DTSTART"].dt),
-                    "end":   str(event["DTEND"].dt),
+                    "start": str(event["DTSTART"].dt)[11:16],
+                    "end":   str(event["DTEND"].dt)[11:16],
                     "location": event.get("LOCATION", ""),
                     "duration": duration,
+                    "hasEnded": has_ended,
                 }
             )
 
-        return {"error": "", "next_events": next_events}
+        return {"error": "", "next_events": sorted(next_events, key=lambda x: x["start"])} # return, sorted by start time
     except Exception as e:
-        logger.error(f"There was an error in get_calendar_events_google. Error: {e}.")
+        logger.error(f"There was an error in get_calendar_events. Error: {e}.")
         return {"error": e, "next_events": None}

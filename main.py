@@ -3,7 +3,7 @@ import time
 import logging
 
 from api.geocoding import geocodeLocation
-from api.google_calendar import get_calendar_events_google
+from api.ical import get_calendar_events
 from api.met_office import GetCurrentWeatherWarningsMetOffice
 from api.spotify import get_next_4_tracks_spotify
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     TFL_BUSES_ENABLED = os.getenv( "TFL_BUSES_ENABLED", "true")
     TFL_BUS_ROUTES = os.getenv(    "TFL_BUS_ROUTES", "18,25,29,140,149,243,207")
 
-    GOOGLE_CALENDAR_ICS_URL = os.getenv("GOOGLE_CALENDAR_ICS_URL", "")
+    CALENDAR_ICS_URL = os.getenv("CALENDAR_ICS_URL", "")
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
@@ -155,8 +155,8 @@ if __name__ == "__main__":
                 enabled_apis.append("tfl-trains")
             if TFL_BUSES_ENABLED == "true":
                 enabled_apis.append("tfl-buses")
-            if GOOGLE_CALENDAR_ICS_URL != "":
-                enabled_apis.append("g-cal")
+            if CALENDAR_ICS_URL != "":
+                enabled_apis.append("ical")
 
             return {
                 "error": "",
@@ -354,13 +354,13 @@ if __name__ == "__main__":
         return caq, 200
 
 
-    @app.route("/api/v1/calendar/google")
-    async def get_google_calendar_flask():
+    @app.route("/api/v1/ical/")
+    async def get_ical_flask():
 
-        if GOOGLE_CALENDAR_ICS_URL == "":
-            return {"message": "This endpoint will not work because the GOOGLE_CALENDAR_ICS_URL environment variable is empty."}
+        if CALENDAR_ICS_URL == "":
+            return {"message": "This endpoint will not work because the CALENDAR_ICS_URL environment variable is empty."}
 
-        cag = get_calendar_events_google(GOOGLE_CALENDAR_ICS_URL, logging)
+        cag = get_calendar_events(CALENDAR_ICS_URL, logging)
 
         if cag['error']:
             return cag, 500
