@@ -4,8 +4,11 @@
     let bak={}, cen={}, cir={}, dis={}, hac={}, jub={}, met={}, nor={}, pic={}, vic={}, wac = {};
 
     onMount(()=> {
+        fetch("http://127.0.0.1:8080/api/v1/transport/tfl/train-status/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
+                // todo: minimise this shit into one array
+                // todo: if line says "Part Suspended" it will push out
                 bak = data.data.Bakerloo;
                 cen = data.data.Central;
                 cir = data.data.Circle;
@@ -24,6 +27,7 @@
 
 <section class="">
     <div class="flex flex-col w-auto h-70 bg-gray-600 rounded-md p-1.5">
+        <!-- todo: use EACH for each train in array TRAINSTATUS-->
 
         <!-- All train lines go below -->
         <div class="flex flex-row">
