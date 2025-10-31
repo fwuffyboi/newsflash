@@ -53,9 +53,30 @@
             console.error("bwipjs error:", e);
         }
 
-        // here, check what apis are enabled and store it, as well as the main user's name
+        updateTime();
+        pingMirrorAPI();
+
+        if ("spotify" in enabled_apis) {
+            getSpotifyNowPlayingData();
+        }
+
+        const timeInterval = setInterval(updateTime, 200);
+        const pingInterval = setInterval(pingMirrorAPI, 10000);
+        const SpotifyInterval = setInterval(getSpotifyNowPlayingData, 3000);
+
+        return () => {
+            clearInterval(timeInterval);
+            clearInterval(pingInterval);
+            if ('spotify' in enabled_apis) {
+                clearInterval(SpotifyInterval);
+            }
+        }
+    });
+
+    // Ping the flask server every 3 seconds to see if the connection is active
+    const pingMirrorAPI = () => {
         try {
-            fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(3000) })
+            fetch("http://127.0.0.1:8080/api/config", { signal: AbortSignal.timeout(2000) })
                 .then(response => response.json())
                 .then(data => {
                     console.log("dnata", data);
@@ -70,29 +91,7 @@
             WebUIHalt = "WebUI HALTED. Network error! - Could not access /api/config on startup/page reload.";
         }
 
-        updateTime();
-        pingMirrorAPI();
-
-        if ("spotify" in enabled_apis) {
-            getSpotifyNowPlayingData();
-        }
-
-        const timeInterval = setInterval(updateTime, 300);
-        const pingInterval = setInterval(pingMirrorAPI, 3000);
-        const SpotifyInterval = setInterval(getSpotifyNowPlayingData, 3000);
-
-        return () => {
-            clearInterval(timeInterval);
-            clearInterval(pingInterval);
-            if ('spotify' in enabled_apis) {
-                clearInterval(SpotifyInterval);
-            }
-        }
-    });
-
-    // Ping the flask server every 3 seconds to see if the connection is active
-    const pingMirrorAPI = () => {
-        fetch("http://192.168.0.226:8080/ping", { signal: AbortSignal.timeout(5000) })
+        fetch("http://127.0.0.1:8080/ping", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
 
@@ -104,7 +103,7 @@
                 activity = false;
                 if (err == "TypeError: NetworkError when attempting to fetch resource.") {
                     if (activityHTTPError !== "") {
-                        activityHTTPError = time + ": Network error! - Could not ping API.";
+                        activityHTTPError = ": Network error! - Could not ping API.";
                     }
                 } else {
                     activityHTTPError = (err);
@@ -113,66 +112,69 @@
         });
     }
     const getSpotifyNowPlayingData = () => {
-        if (activity && enabled_apis.includes('spotify')) {
-            fetch("http://192.168.0.226:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
+        if (enabled_apis.includes('spotify')) {
+            if (activity) {
+                fetch("http://127.0.0.1:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
 
-                    // Create a temp list var for the queue and each track in it
-                    // let spotifyQueueItem;
-                    // let spotifyQueueList = {};
+                        // Create a temp list var for the queue and each track in it
+                        // let spotifyQueueItem;
+                        // let spotifyQueueList = {};
 
-                    // check if the user has any playback
-                    if (data.error == "NPIF") {
+                        // check if the user has any playback
+                        if (data.error == "NPIF") {
 
-                        // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
-                        spotifyFixedData = {
-                            "title":       "Nothing is playing right now...",
-                            "album":       "",
-                            "artists":     "",
-                            "cover":       "bleeehhh this isnt used anymore but keep it for reasons bleeehhh",
-                            "device_name": "",
-                            "device_type": "",
-                            "duration_ms": 0,
-                            "progress_ms": 0,
-                            "is_playing":  false,
-                            "id":          "",
-                            "link":        ""
+                            // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
+                            spotifyFixedData = {
+                                "title":       "Nothing is playing right now...",
+                                "album":       "",
+                                "artists":     "",
+                                "cover":       "bleeehhh this isnt used anymore but keep it for reasons bleeehhh",
+                                "device_name": "",
+                                "device_type": "",
+                                "duration_ms": 0,
+                                "progress_ms": 0,
+                                "is_playing":  false,
+                                "id":          "",
+                                "link":        ""
 
-                            // "queue": {}
-                        };
+                                // "queue": {}
+                            };
 
 
-                    } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
-                        // for (spotifyQueueItem in data.next_tracks) {
-                        //     spotifyQueueList += data.next_tracks[spotifyQueueItem];
-                        // }
+                        } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
+                            // for (spotifyQueueItem in data.next_tracks) {
+                            //     spotifyQueueList += data.next_tracks[spotifyQueueItem];
+                            // }
 
-                        spotifyFixedData = {
-                            "title":       data.data.current_track.track_name,
-                            "album":       data.data.current_track.album,
-                            "artists":     data.data.current_track.artists,
-                            "cover":       data.data.current_track.cover,
-                            "device_name": data.data.current_track.device,
-                            "device_type": data.data.current_track.device_type,
-                            "duration_ms": data.data.current_track.duration_ms,
-                            "progress_ms": data.data.current_track.progress_ms,
-                            "is_playing":  data.data.current_track.is_playing,
-                            "id":          data.data.current_track.id,
-                            "link":        data.data.current_track.link
+                            spotifyFixedData = {
+                                "title": data.data.current_track.track_name,
+                                "album": data.data.current_track.album,
+                                "artists": data.data.current_track.artists,
+                                "cover": data.data.current_track.cover,
+                                "device_name": data.data.current_track.device,
+                                "device_type": data.data.current_track.device_type,
+                                "duration_ms": data.data.current_track.duration_ms,
+                                "progress_ms": data.data.current_track.progress_ms,
+                                "is_playing": data.data.current_track.is_playing,
+                                "id": data.data.current_track.id,
+                                "link": data.data.current_track.link
 
-                            // "queue":       spotifyQueueList
-                        };
-                        console.log(spotifyFixedData)
-                    }
-
-                })
+                                // "queue":       spotifyQueueList
+                            };
+                            console.log(spotifyFixedData)
+                        }
+                    })
+            } else {
+                // we do nothing here
+            }
         }
-
     }
 
-    const VERSION = "ALPHA-0.4.0";
+    const VERSION = "ALPHA-0.8.0";
+    const COPYRIGHT = "(C) MIT " + (new Date).getFullYear() + " Ashley Caramel";
     const pageTitle = "NewsFlash Application"
 
 </script>
@@ -235,14 +237,21 @@
 
 {#if activity || activityHTTPError !== ''}
     <!-- Bottom right and left corners -->
-    <div class="text-right text-white fixed bottom-1 left-1 mb-0">
-        <span class="italic">{VERSION}</span>
+    <div class="text-white fixed bottom-1 left-1 mb-0">
+        <div class="flex flex-col">
+            <span class="italic">{VERSION}</span>
+            <span class="italic">{COPYRIGHT}</span>
+        </div>
+
         <div class="w-23 h-23 bg-white rounded-sm">
             <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
         </div>
 
+
+
     </div>
 {/if}
+
 {#if activity}
     <div class="text-right text-white fixed bottom-0 right-1.5 mb-0 w-190">
         <div class="flex flex-col italic font-thin tracking-tighter animate-pulse">
@@ -251,4 +260,3 @@
         </div>
     </div>
 {/if}
-
