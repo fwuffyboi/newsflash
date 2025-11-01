@@ -1,7 +1,7 @@
 # Newsflash API
 
 ---
-_Last updated: 2025/10/06_
+_Last updated: 2025/11/01_
 
 Newsflash is a custom-built project for myself, its purpose is to act as a smart mirror.
 
