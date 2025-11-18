@@ -6,11 +6,9 @@
     } from "lucide-svelte";
     import { m } from '$lib/paraglide/messages.js'; // i18n
     import AirQuality from "./AirQuality.svelte";
-    import { weatherAlerts } from '../stores/weatherAlerts';
-    let alerts = $state($weatherAlerts);
+    let alerts_int = $state(0);
 
     import {onMount} from "svelte";
-    import {getLocale} from "$lib/paraglide/runtime.js";
 
     let desc =       $state("Loading...");
     let loc =        $state("Loading...");
@@ -39,7 +37,6 @@
                 temp =     data.data.weather.temperature;
                 wind =     data.data.weather.wind_speed;
                 icon =     data.data.weather.icon;
-                unit =    'metric'
 
                 // process weather data
                 desc = desc[0].toUpperCase() + desc.slice(1); // uppercase first letter :3
@@ -73,7 +70,19 @@
 
                 else {bg_gradient = "from-gray-400 to-gray-600 bg-linear-150";lucide_icon="cloud_err"}
 
-            })
+            });
+
+        // Secondly, get the amount of weather alerts
+        fetch("http://192.168.0.226:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data);
+
+                // check if not empty
+                if (data.warnings.length !== 0) {
+                    alerts_int += 1;
+                }
+            });
     });
 
 </script>
@@ -112,8 +121,7 @@
             </div>
             <div class="flex flex-row gap-2">
                 <span class="font-bold text-xl">{loc}</span>
-                {#if alerts.length > 0}
-                    <!-- TODO/BUGFIX: doesnt show up sometimes and this is IMPORTANT -->
+                {#if alerts_int > 0}
                     <TriangleAlert class="animate-pulse bg-red-500 rounded-md p-1" size="30" />
                 {/if}
             </div>
@@ -138,10 +146,13 @@
                 </div>
                 <div class="flex flex-row pl-2">
                     <Wind size="23"/>
-                    <span class="pl-1">{wind}</span>
+                    <span class="pl-1">{wind}&nbsp;</span>
+                    <span>{m.weather_kmh_unit()}</span>
                 </div>
             </div>
-            <div class="text-gray-200"><span>{m.weather_all_units_in({ units: unit })}</span></div>
+            <div class="text-gray-200">
+                <span>{m.weather_all_units_in_metric()}</span>
+            </div>
         </div>
 
     </div>
