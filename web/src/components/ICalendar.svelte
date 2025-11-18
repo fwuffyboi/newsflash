@@ -7,14 +7,15 @@
     let events = $state([
         {
             "desc": "Loading...",
-            "duration": "23:59:59",
-            "end": "23:59",
+            "duration": "24:00:00",
+            "end": "24:00",
             "hasEnded": false,
             "location": "",
             "start": "00:00",
             "title": "Loading...",
         }
     ]);
+    let ecount = $derived(events.length);
     let message = $state();
     let d = new Date();
 
@@ -24,7 +25,7 @@
             .then(data => {
 
                 events = data.next_events;
-                console.log(events);
+                // console.log(events);
                 message = data.error;
 
             })
@@ -40,11 +41,12 @@
 
 </script>
 
-<section class="h-fit w-125 rounded-md bg-gradient-to-tr from-blue-950 to-cyan-950">
+<section class="h-fit w-125 rounded-md bg-gradient-to-tr from-blue-800 to-cyan-900">
 
-    <div class="pt-2 px-3 flex flex-row text-white font-bold text-lg justify-between">
-        <span class="underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>
-        <CalendarFold />
+    <div class="pt-2 px-3 flex flex-row text-white font-bold text-lg ">
+        <CalendarFold size="26" />
+        <span class="pl-1 underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>
+
     </div>
 
     <div class="flex flex-col rounded-lg pl-4 pb-4 pt-1 text-white">
@@ -84,7 +86,7 @@
             {/each}
             <!-- todo {#if not events}-->
             <!--    <span>Theres no events today! Enjoy a clear calendar!</span>-->
-            <!--{#if events.length = 0}-->
+            <!--{#if ecount = 0}-->
             <!--    <span>no events :c</span>-->
             <!--{/if}-->
 
