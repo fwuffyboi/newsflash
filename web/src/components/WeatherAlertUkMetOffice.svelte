@@ -5,10 +5,10 @@
     let weather_alerts: any[] = $state([]);
 
     onMount(() => {
-        fetch("http://127.0.0.1:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
+        fetch("http://192.168.0.226:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                // console.log(data);
 
                 // check if not empty
                 if (data.warnings.length !== 0) {
@@ -29,9 +29,6 @@
 <!-- CurrentWeather Alert Area -->
 {#if (weather_alerts.length > 0)}
     <section class=" flex flex-col h-auto min-w-60 max-w-140 rounded-lg grad p-3 from-amber-600 to-red-700 bg-linear-140 text-white">
-        <div class="w-auto h-auto flex flex-row gap-2 pb-1">
-            <img class="w-50 p-2" src="/mo-green-white.svg" alt="met office logo">
-        </div>
         <div class="flex flex-col gap-2">
             {#each weather_alerts as wa_item}
                 {#if wa_item.level !== 'Unknown'}
@@ -97,7 +94,8 @@
             {/each}
         </div>
         <div class="p-2 pr-4 max-w-160 animate-pulse">
-            <span class="text-red-300">DISCLAIMER!: Data is for informational purposes only and may be incorrect.</span>
+<!--            todo: translate-->
+            <span class="text-red-300">Data is for informational purposes only and may be incorrect.</span>
         </div>
     </section>
 {/if}

@@ -27,10 +27,10 @@
     let lucide_icon = $state("")
 
     onMount(() => {
-        fetch("http://127.0.0.1:8080/api/v1/weather/current/", { signal: AbortSignal.timeout(5000) })
+        fetch("http://192.168.0.226:8080/api/v1/weather/current/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                // console.log(data);
                 desc =     data.data.weather.description;
                 loc =      data.data.location.name;
                 humidity = data.data.weather.humidity;

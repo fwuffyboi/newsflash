@@ -9,7 +9,6 @@ from datetime import datetime, time, timedelta
 
 
 def get_calendar_events(cal_url, logger):
-    # Parse the URL
 
     cal_req = requests.get(cal_url)
     if cal_req.status_code != 200:

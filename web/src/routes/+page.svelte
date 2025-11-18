@@ -20,16 +20,16 @@
     let users_name = 'User';
 
     let spotifyFixedData = {
-        "title":       "",
-        "album":       "",
-        "artists":     "",
+        "title":       "Loading...",
+        "album":       "Loading...",
+        "artists":     "Loading...",
         "cover":       "",
-        "device_name": "",
-        "device_type": "",
+        "device_name": "Loading...",
+        "device_type": "Loading...",
         "duration_ms": 1000,
         "progress_ms": 0,
-        "is_playing":  false,
-        "id":          "",
+        "is_playing":  true,
+        "id":          "Loading...",
         "link":        ""
 
         // "queue":       {}
@@ -76,27 +76,22 @@
     // Ping the flask server every 3 seconds to see if the connection is active
     const pingMirrorAPI = () => {
         try {
-            fetch("http://127.0.0.1:8080/api/config", { signal: AbortSignal.timeout(2000) })
+            fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(2000) })
                 .then(response => response.json())
                 .then(data => {
-                    console.log("dnata", data);
                     users_name = data.user_name;
-                    console.log(users_name);
                     enabled_apis.pop()
                     enabled_apis = data.enabled_apis
-                    console.log(enabled_apis);
+                    console.log("enabled apis: ", enabled_apis);
                 })
         } catch (e) {
             enabled_apis = ['']
             WebUIHalt = "WebUI HALTED. Network error! - Could not access /api/config on startup/page reload.";
         }
 
-        fetch("http://127.0.0.1:8080/ping", { signal: AbortSignal.timeout(5000) })
+        fetch("http://192.168.0.226:8080/ping", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-
-                console.log(data);
-
                 activityHTTPError = '';
             }).catch(function(err) {
                 console.log('Fetch Error: ', err);
@@ -114,10 +109,10 @@
     const getSpotifyNowPlayingData = () => {
         if (enabled_apis.includes('spotify')) {
             if (activity) {
-                fetch("http://127.0.0.1:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
+                fetch("http://192.168.0.226:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
+                        console.log("spotify current data (playback):", data);
 
                         // Create a temp list var for the queue and each track in it
                         // let spotifyQueueItem;
@@ -131,7 +126,7 @@
                                 "title":       "Nothing is playing right now...",
                                 "album":       "",
                                 "artists":     "",
-                                "cover":       "bleeehhh this isnt used anymore but keep it for reasons bleeehhh",
+                                "cover":       "",
                                 "device_name": "",
                                 "device_type": "",
                                 "duration_ms": 0,
@@ -150,30 +145,28 @@
                             // }
 
                             spotifyFixedData = {
-                                "title": data.data.current_track.track_name,
-                                "album": data.data.current_track.album,
-                                "artists": data.data.current_track.artists,
-                                "cover": data.data.current_track.cover,
+                                "title":       data.data.current_track.track_name,
+                                "album":       data.data.current_track.album,
+                                "artists":     data.data.current_track.artists,
+                                "cover":       data.data.current_track.cover,
                                 "device_name": data.data.current_track.device,
                                 "device_type": data.data.current_track.device_type,
                                 "duration_ms": data.data.current_track.duration_ms,
                                 "progress_ms": data.data.current_track.progress_ms,
-                                "is_playing": data.data.current_track.is_playing,
-                                "id": data.data.current_track.id,
-                                "link": data.data.current_track.link
+                                "is_playing":  data.data.current_track.is_playing,
+                                "id":          data.data.current_track.id,
+                                "link":        data.data.current_track.link
 
                                 // "queue":       spotifyQueueList
                             };
-                            console.log(spotifyFixedData)
+                            // console.log(spotifyFixedData)
                         }
                     })
-            } else {
-                // we do nothing here
             }
         }
     }
 
-    const VERSION = "ALPHA-0.8.0";
+    const VERSION = "ALPHA-0.9.2";
     const COPYRIGHT = "(C) MIT " + (new Date).getFullYear() + " Ashley Caramel";
     const pageTitle = "NewsFlash Application"
 
