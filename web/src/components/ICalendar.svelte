@@ -2,17 +2,29 @@
     import {onMount} from "svelte";
     import {m} from "$lib/paraglide/messages.js"
     import {getLocale} from "$lib/paraglide/runtime.js";
+    import {CalendarFold} from "lucide-svelte";
 
-    let events = $state();
+    let events = $state([
+        {
+            "desc": "Loading...",
+            "duration": "23:59:59",
+            "end": "23:59",
+            "hasEnded": false,
+            "location": "",
+            "start": "00:00",
+            "title": "Loading...",
+        }
+    ]);
     let message = $state();
     let d = new Date();
 
     onMount(() => {
-        fetch("http://127.0.0.1:8080/api/v1/ical/", { signal: AbortSignal.timeout(5000) })
+        fetch("http://192.168.0.226:8080/api/v1/ical/", { signal: AbortSignal.timeout(8000) })
             .then(response => response.json())
             .then(data => {
 
                 events = data.next_events;
+                console.log(events);
                 message = data.error;
 
             })
@@ -30,8 +42,9 @@
 
 <section class="h-fit w-125 rounded-md bg-gradient-to-tr from-blue-950 to-cyan-950">
 
-    <div class="pt-2 px-3 text-white font-bold text-lg">
+    <div class="pt-2 px-3 flex flex-row text-white font-bold text-lg justify-between">
         <span class="underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>
+        <CalendarFold />
     </div>
 
     <div class="flex flex-col rounded-lg pl-4 pb-4 pt-1 text-white">
@@ -41,28 +54,28 @@
                 <div class="max-w-120 pb-3">
 
                     <div class="{Coie(e.hasEnded)}">
-
                         <div class="flex flex-col">
+
                             <div class="flex flex-row justify-between pr-4">
                                 <span>{e.title}</span>
                                 <span>{e.start} - {e.end}</span>
                             </div>
-                            {#if e.desc.length > 0}
-                                <div class="flex flex-row line-clamp-2 italic font-thin">
-                                    <span class="font-bold">{m.ical_desc()}:&nbsp;</span>
-                                    <span>{e.desc}</span>
-                                </div>
-                            {/if}
 
-                            {#if e.location.length > 0}
-                                <div class="flex flex-row line-clamp-2 italic font-thin">
-                                    <span class="font-bold">{m.ical_location()}:&nbsp;</span>
-                                    <span>{e.location}</span>
-                                </div>
-                            {/if}
+                            <!--{#if e.desc.length > 0}-->
+                            <!--    <div class="flex flex-row line-clamp-2 italic font-thin">-->
+                            <!--        <span class="font-bold">{m.ical_desc()}:&nbsp;</span>-->
+                            <!--        <span>{e.desc}</span>-->
+                            <!--    </div>-->
+                            <!--{/if}-->
+
+                            <!--{#if e.location.length > 0}-->
+                            <!--    <div class="flex flex-row line-clamp-2 italic font-thin">-->
+                            <!--        <span class="font-bold">{m.ical_location()}:&nbsp;</span>-->
+                            <!--        <span>{e.location}</span>-->
+                            <!--    </div>-->
+                            <!--{/if}-->
 
                         </div>
-
                     </div>
 
                     <hr class="w-85">
@@ -71,6 +84,8 @@
             {/each}
             <!-- todo {#if not events}-->
             <!--    <span>Theres no events today! Enjoy a clear calendar!</span>-->
+            <!--{#if events.length = 0}-->
+            <!--    <span>no events :c</span>-->
             <!--{/if}-->
 
         </div>
