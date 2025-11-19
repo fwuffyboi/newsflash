@@ -12,6 +12,7 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     # url = f"http://localhost:5173/UK" # TESTING URL
     try:
         feed = feedparser.parse(url)
+    #     todo: add caching
     except Exception as e:
         logger.error(f"Attempt to get weather warnings failed. Error: feedparser e:{e.__traceback__}")
         return ['!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!',
