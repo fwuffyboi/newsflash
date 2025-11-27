@@ -15,10 +15,8 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     #     todo: add caching
     except Exception as e:
         logger.error(f"Attempt to get weather warnings failed. Error: feedparser e:{e.__traceback__}")
-        return ['!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!',
-                '!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!',
-                '!!!COULD NOT PARSE RSS FEED FOR MET OFFICE!!!'
-        ]
+        return {"error": e, "warnings": []}
+
 
     warnings = []
 
