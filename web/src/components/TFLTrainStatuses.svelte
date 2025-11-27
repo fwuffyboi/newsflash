@@ -21,7 +21,6 @@
         fetch("http://192.168.0.226:8080/api/v1/transport/tfl/train-status/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                // todo: if line says "Part Suspended" it will push out further
 
                 tfld = data.data;
 

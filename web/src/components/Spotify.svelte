@@ -3,7 +3,7 @@
     import {m} from "$lib/paraglide/messages.js"
     import {LaptopMinimal, Smartphone, Speaker} from "lucide-svelte";
 
-    let { songName = "Loading..", songArtists = "Loading..", albumName = "Loading..", albumImg, nowPlaying = true, devicetype, devicename, queue = []} = $props();
+    let { songName, songArtists, albumName, albumImg, nowPlaying = true, devicetype, devicename, queue = []} = $props();
 
 </script>
 
@@ -24,7 +24,7 @@
         <div class="flex flex-col pr-1 text-right">
 
             <!-- Song name -->
-            <div class="flex flex-col gap-2 text-white text-right ml-auto"> <!-- todo: there HAS to be a better way than this -->
+            <div class="flex flex-col gap-2 text-white text-right ml-auto">
                 <img class="w-11 ml-auto" src="/spotify_logo_white.svg" alt="">
 
                 <div class="flex flex-row gap-1 ml-auto text-green-500">

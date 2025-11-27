@@ -46,6 +46,7 @@ def get_set_bus_statuses_tfl(buses, logger):
     url = "https://api.tfl.gov.uk/Line/Mode/bus/Status"
 
     response = requests.get(url)
+    # todo: add caching (5min only)
 
     bus_statuses_data = []
     buses = buses.split(',')

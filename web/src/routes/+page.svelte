@@ -34,7 +34,12 @@
         "id":          "Loading...",
         "link":        "",
 
-        "queue":       {}
+        "queue":       [
+            {
+                "artists": "Loading...",
+                "cover": "",
+                "track_name": "Loading...",
+            }]
     };
 
     onMount(() => {
@@ -168,6 +173,26 @@
                             console.log("spotify current data (queue):", spotifyQueueList);
                         }
                     })
+            } else {
+
+                console.log("IJSANUMP");
+
+                // since activity is false, we can ignore actually returning real data.
+                spotifyFixedData = {
+                    "title":       "Nothing is playing right now...",
+                    "album":       "",
+                    "artists":     "",
+                    "cover":       "",
+                    "device_name": "",
+                    "device_type": "",
+                    "duration_ms": 0,
+                    "progress_ms": 0,
+                    "is_playing":  false,
+                    "id":          "",
+                    "link":        "",
+
+                    "queue": []
+                };
             }
         }
     }
