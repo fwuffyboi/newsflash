@@ -9,7 +9,7 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     """
 
     url = f"https://weather.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/{uk_region}"
-    # url = f"http://localhost:5173/UK" # TESTING URL
+    # url = f"http://localhost:5173/UK-weathertest.txt" # TESTING URL
     try:
         feed = feedparser.parse(url)
     #     todo: add caching
@@ -28,11 +28,11 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
             title = entry.title
             description = entry.description
             link = entry.link
-            if 'red warning' in str(title).lower():
+            if 'red' in str(title).lower():
                 warn_level = 'Red'
-            elif 'amber warning' in str(title).lower():
+            elif 'amber' in str(title).lower():
                 warn_level = 'Amber'
-            elif 'yellow warning' in str(title).lower():
+            elif 'yellow' in str(title).lower():
                 warn_level = 'Yellow'
             else:
                 warn_level = 'Unknown'

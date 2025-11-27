@@ -1,7 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
 
-    import {m} from "$lib/paraglide/messages.js"
     import {TriangleAlert} from "lucide-svelte";
 
     let weather_alerts: any[] = $state([]);
@@ -29,12 +28,12 @@
     function bgColour(color: string) {
         if (color === "Red") {
             return "bg-red-500"
-        } else if (color === "Orange") {
+        } else if (color === "Amber") {
             return "bg-orange-500"
         } else if (color === "Yellow") {
-            return "bg-yellow-500"
+            return "bg-amber-400"
         } else if (color === "Unknown") {
-            return "bg-amber-500"
+            return "bg-"
         } else {
             return "bg-amber-500"
         }
