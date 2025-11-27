@@ -24,27 +24,24 @@
                 // todo: if line says "Part Suspended" it will push out further
 
                 tfld = data.data;
-                console.log(tfld);
-                console.log(Object.entries(tfld))
+
             })
     })
 
 </script>
 
-<section class="">
-    <div class="flex flex-col w-auto h-70 bg-gray-600 rounded-md p-1.5">
+<section class="flex flex-col w-50 h-70 bg-gray-600 rounded-md p-1.5">
 
 <!-- All train lines go below -->
-        {#each Object.entries(tfld) as [lineName, lineStatus], index}
-            <div class="flex flex-row {index % 2 ? '' : 'bg-gray-500' } rounded-md">
-                <div class="h-6 w-21 flex flex-row {lineColour[lineName]} {index === 0 ? 'rounded-t-md' : ''} {index === 10 ? 'rounded-b-md' : ''} text-white pl-1">
-                    <span class="font-semibold tracking-tight truncate">{lineName}</span>
-                </div>
-                <div class="text-white pl-1 max-w-26 tracking-tight font-sans pr-2 truncate">
-                    <span>{lineStatus.status}</span>
-                </div>
+    {#each Object.entries(tfld) as [lineName, lineStatus], index}
+        <div class="flex flex-row {index % 2 ? '' : 'bg-gray-500' } rounded-md">
+            <div class="h-6 w-21 flex flex-row {lineColour[lineName]} {index === 0 ? 'rounded-t-md' : ''} {index === 10 ? 'rounded-b-md' : ''} text-white pl-1">
+                <span class="font-semibold tracking-tight truncate">{lineName}</span>
             </div>
-        {/each}
+            <div class="text-white pl-1 tracking-tight font-sans pr-2 truncate">
+                <span>{lineStatus.status}</span>
+            </div>
+        </div>
+    {/each}
 
-    </div>
 </section>

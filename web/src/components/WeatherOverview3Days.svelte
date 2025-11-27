@@ -4,8 +4,6 @@
         CloudDrizzle, CloudSnow, CloudFog, CloudAlert,
         Droplet, Wind, Sunrise, Sunset, TriangleAlert
     } from "lucide-svelte";
-    import { weatherAlerts } from '../stores/weatherAlerts';
-    let alerts = $state($weatherAlerts);
 
     import {onMount} from "svelte";
 
@@ -27,7 +25,7 @@
         fetch("http://192.168.0.226:8080/api/v1/weather/forecast/simplified", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                // console.log(data);
 
                 if (["01d", "01n", "02d", "02n"].includes(icon)) {
                     if (temp >= 18) {bg_gradient = "from-yellow-400 to-amber-600 bg-linear-150";

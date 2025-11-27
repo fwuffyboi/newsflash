@@ -17,6 +17,8 @@
 
     let enabled_apis: [string] = ['']
 
+    let spotifyQueueList = [];
+
     let users_name = 'User';
 
     let spotifyFixedData = {
@@ -30,9 +32,9 @@
         "progress_ms": 0,
         "is_playing":  true,
         "id":          "Loading...",
-        "link":        ""
+        "link":        "",
 
-        // "queue":       {}
+        "queue":       {}
     };
 
     onMount(() => {
@@ -95,7 +97,7 @@
                 activityHTTPError = '';
             }).catch(function(err) {
                 console.log('Fetch Error: ', err);
-                activity = false;
+                activity = true;
                 if (err == "TypeError: NetworkError when attempting to fetch resource.") {
                     if (activityHTTPError !== "") {
                         activityHTTPError = ": Network error! - Could not ping API.";
@@ -133,16 +135,20 @@
                                 "progress_ms": 0,
                                 "is_playing":  false,
                                 "id":          "",
-                                "link":        ""
+                                "link":        "",
 
-                                // "queue": {}
+                                "queue": []
                             };
 
 
                         } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
-                            // for (spotifyQueueItem in data.next_tracks) {
-                            //     spotifyQueueList += data.next_tracks[spotifyQueueItem];
-                            // }
+                            let spotifyQueueItem;
+                            spotifyQueueList = [];
+                            console.log("data list:", data.data.next_tracks);
+
+                            for (spotifyQueueItem in data.data.next_tracks) {
+                                spotifyQueueList.push(data.data.next_tracks[spotifyQueueItem]);
+                            }
 
                             spotifyFixedData = {
                                 "title":       data.data.current_track.track_name,
@@ -155,18 +161,18 @@
                                 "progress_ms": data.data.current_track.progress_ms,
                                 "is_playing":  data.data.current_track.is_playing,
                                 "id":          data.data.current_track.id,
-                                "link":        data.data.current_track.link
+                                "link":        data.data.current_track.link,
 
-                                // "queue":       spotifyQueueList
+                                "queue":       spotifyQueueList
                             };
-                            // console.log(spotifyFixedData)
+                            console.log("spotify current data (queue):", spotifyQueueList);
                         }
                     })
             }
         }
     }
 
-    const VERSION = "ALPHA-0.9.2";
+    const VERSION = "BETA-0.10.0";
     const COPYRIGHT = "(C) MIT " + (new Date).getFullYear() + " Ashley Caramel";
     const pageTitle = "NewsFlash Application"
 
@@ -174,7 +180,7 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
-	<meta name="description" content="The KIRASTAR NewsFlash application." />
+	<meta name="description" content="The NewsFlash application." />
 </svelte:head>
 
 
@@ -202,9 +208,10 @@
 
             {#if enabled_apis.includes('spotify')}
                 <Spotify
-                        albumImg = {spotifyFixedData.cover} albumName = {spotifyFixedData.album}
-                        songName = {spotifyFixedData.title} songArtists={spotifyFixedData.artists}
-                        nowPlaying={spotifyFixedData.is_playing} songURL={spotifyFixedData.link}
+                        albumImg  = {spotifyFixedData.cover} albumName     = {spotifyFixedData.album}
+                        songName  = {spotifyFixedData.title} songArtists   ={spotifyFixedData.artists}
+                        nowPlaying={spotifyFixedData.is_playing} devicetype={spotifyFixedData.device_type}
+                        devicename={spotifyFixedData.device_name}     queue={spotifyFixedData.queue}
                 />
             {/if}
             <div class="flex flex-row gap-2">

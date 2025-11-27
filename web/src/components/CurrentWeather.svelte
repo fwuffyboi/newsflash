@@ -76,12 +76,7 @@
         fetch("http://192.168.0.226:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
-                // console.log(data);
-
-                // check if not empty
-                if (data.warnings.length !== 0) {
-                    alerts_int += 1;
-                }
+                alerts_int = data.warnings.length;
             });
     });
 

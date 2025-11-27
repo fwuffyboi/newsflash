@@ -41,25 +41,24 @@
 
 </script>
 
-<section class="h-fit w-125 rounded-md bg-gradient-to-tr from-blue-800 to-cyan-900">
+<section class="h-fit w-100 max-w-127 rounded-md bg-gradient-to-tr from-blue-800 to-cyan-900">
 
-    <div class="pt-2 px-3 flex flex-row text-white font-bold text-lg ">
-        <CalendarFold size="26" />
+    <div class="pt-2 px-3 pb-1 flex flex-row text-white font-bold text-lg ">
+        <CalendarFold size="25" />
         <span class="pl-1 underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>
 
     </div>
 
     <div class="flex flex-col rounded-lg pl-4 pb-4 pt-1 text-white">
-        <div class="flex flex-col">
+        <div class="flex flex-col gap-1">
 
             {#each events as e}
-                <div class="max-w-120 pb-3">
+                <div class="max-w-120">
 
                     <div class="{Coie(e.hasEnded)}">
                         <div class="flex flex-col">
-
                             <div class="flex flex-row justify-between pr-4">
-                                <span>{e.title}</span>
+                                <span class="truncate">{e.title}</span>
                                 <span>{e.start} - {e.end}</span>
                             </div>
 
@@ -79,8 +78,6 @@
 
                         </div>
                     </div>
-
-                    <hr class="w-85">
 
                 </div>
             {/each}

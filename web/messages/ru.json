@@ -10,8 +10,9 @@
 	"locale_back_home": "Click here to go back: ",
 
 	"weather_current_weather_in": "Current weather in",
-	"weather_all_units_in": "All units in {units}",
+	"weather_all_units_in_metric": "All units in metric",
 	"weather_last_updated": "Last updated: ",
+	"weather_kmh_unit": "Km/h",
 
 	"ical_today": "Today",
 	"ical_location": "Location",
@@ -24,5 +25,9 @@
 	"aqi_hazardous_air_quality": "Hazardous air quality!!",
 	"aqi_error": "AQI Error",
 
-	"spotify_nothing_is_playing": "Nothing's playing..."
+	"spotify_nothing_is_playing": "Nothing's playing...",
+	"spotify_up_next": "Up next",
+	"spotify_now_playing": "Now playing...",
+
+	"data_disclaimer_short": "Data is for informational purposes only and may be incorrect."
 }

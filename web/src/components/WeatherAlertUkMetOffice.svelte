@@ -1,6 +1,8 @@
 <script lang="ts">
     import {onMount} from "svelte";
-    import {weatherAlerts} from "../stores/weatherAlerts";
+
+    import {m} from "$lib/paraglide/messages.js"
+    import {TriangleAlert} from "lucide-svelte";
 
     let weather_alerts: any[] = $state([]);
 
@@ -12,7 +14,6 @@
 
                 // check if not empty
                 if (data.warnings.length !== 0) {
-                    weatherAlerts.set(data.warnings);
                     for (const element of data.warnings) {
                         weather_alerts.push({
                             'title': element.title,
@@ -24,78 +25,40 @@
                 }
             });
     });
+
+    function bgColour(color: string) {
+        if (color === "Red") {
+            return "bg-red-500"
+        } else if (color === "Orange") {
+            return "bg-orange-500"
+        } else if (color === "Yellow") {
+            return "bg-yellow-500"
+        } else if (color === "Unknown") {
+            return "bg-amber-500"
+        } else {
+            return "bg-amber-500"
+        }
+    }
 </script>
 
 <!-- CurrentWeather Alert Area -->
 {#if (weather_alerts.length > 0)}
-    <section class=" flex flex-col h-auto min-w-60 max-w-140 rounded-lg grad p-3 from-amber-600 to-red-700 bg-linear-140 text-white">
-        <div class="flex flex-col gap-2">
+    <section class="flex flex-col h-auto text-white">
+
+        <div class="flex flex-col gap-2 max-w-127">
             {#each weather_alerts as wa_item}
-                {#if wa_item.level !== 'Unknown'}
-
-                    {#if wa_item.level === 'Yellow'}
-                        <div class="rounded-xl bg-yellow-500 w-auto p-2">
-                            <div class="flex flex-col">
-                                <div class="animate-pulse">
-                                    <span class="font-black text-lg tracking-tight">{wa_item.level} weather alert: </span>
-                                    <span class="font-bold">{wa_item.title}</span>
-                                </div>
-                                <span class="font-light">{wa_item.desc}</span>
-
-                            </div>
-
+                <div class="rounded-lg {bgColour(wa_item.level)} w-auto p-2 pt-1">
+                    <div class="flex flex-col">
+                        <div class="flex flex-row gap-2">
+                            <TriangleAlert class="animate-pulse rounded-md p-0.5" size={56} />
+                            <span class="text-lg font-bold">{wa_item.title}</span>
                         </div>
-                    {/if}
-
-                    {#if wa_item.level === 'Amber'}
-                        <div class="rounded-xl bg-orange-500 w-auto p-2">
-                            <div class="flex flex-col">
-                                <div class="animate-pulse">
-                                    <span class="font-black text-lg tracking-tight">{wa_item.level} weather alert: </span>
-                                    <span class="font-bold">{wa_item.title}</span>
-                                </div>
-                                <span class="font-light">{wa_item.desc}</span>
-
-                            </div>
-
-                        </div>
-                    {/if}
-
-                    {#if wa_item.level === 'Red'}
-                        <div class="rounded-xl bg-red-500 w-auto p-2">
-                            <div class="flex flex-col">
-                                <div class="animate-pulse">
-                                    <span class="font-black text-lg tracking-tight">{wa_item.level} weather alert: </span>
-                                    <span class="font-bold">{wa_item.title}</span>
-                                </div>
-                                <span class="font-light">{wa_item.desc}</span>
-
-                            </div>
-
-                        </div>
-                    {/if}
-
-                {/if}
-
-                {#if wa_item.level === 'Unknown'}
-                    <div class="rounded-xl bg-gray-400 w-auto p-2">
-                        <div class="flex flex-col">
-                            <div class="animate-pulse">
-                                <span class="font-black text-lg tracking-tight">{wa_item.level} weather alert: </span>
-                                <span class="font-bold">{wa_item.title}</span>
-                            </div>
-                            <span class="font-light">{wa_item.desc}</span>
-
-                        </div>
-
+                        <hr>
+                        <span class="font-light">{wa_item.desc}</span>
                     </div>
-                {/if}
-
+                </div>
             {/each}
         </div>
-        <div class="p-2 pr-4 max-w-160 animate-pulse">
-<!--            todo: translate-->
-            <span class="text-red-300">Data is for informational purposes only and may be incorrect.</span>
-        </div>
+
     </section>
 {/if}
