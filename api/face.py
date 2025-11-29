@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CASCADE_PATH = os.path.join(SCRIPT_DIR, "haarcascade_frontalface_default.xml")
-print(SCRIPT_DIR, CASCADE_PATH)
+CASCADE_PATH = os.path.join(SCRIPT_DIR, "../assets/haarcascade_frontalface_default.xml")
+# print(SCRIPT_DIR, CASCADE_PATH)
 
 cascade = cv2.CascadeClassifier(CASCADE_PATH)
 
