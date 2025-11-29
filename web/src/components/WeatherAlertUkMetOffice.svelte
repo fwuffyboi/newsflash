@@ -53,7 +53,7 @@
                             <span class="text-lg font-bold">{wa_item.title}</span>
                         </div>
                         <hr>
-                        <span class="font-light">{wa_item.desc}</span>
+                        <span>{wa_item.desc}</span>
                     </div>
                 </div>
             {/each}
