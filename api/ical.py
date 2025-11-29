@@ -28,6 +28,22 @@ def get_calendar_events(cal_url, logger):
                                    end_of_today + timedelta(seconds=1))  # include events ending at 23:59:59
 
         next_events = []
+
+        if len(all_events) == 0:
+            # if no events today, add one fake one.
+            next_events.append(
+                {
+                    "title": "No events today!",
+                    "desc": "",
+                    "start": "",
+                    "end": "",
+                    "location": "",
+                    "duration": "All day",
+                    "hasEnded": False,
+                }
+            )
+
+
         for event in all_events:
             if str(event["DTEND"].dt - event["DTSTART"].dt) == "1 day, 0:00:00":
                 duration = "All day"
