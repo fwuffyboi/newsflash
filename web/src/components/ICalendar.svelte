@@ -53,13 +53,15 @@
         <div class="flex flex-col">
 
             {#each events as e}
-                <div class="max-w-120">
-
-                    <div class="{Coie(e.hasEnded)}">
+                    <div class="max-w-160 {Coie(e.hasEnded)}">
                         <div class="flex flex-col">
                             <div class="flex flex-row justify-between pr-4">
                                 <span class="truncate font-semibold">{e.title}</span>
-                                <span>{e.start} - {e.end}</span>
+
+                                {#if e.start !== "" && e.end !== ""}
+                                    <span>{e.start} - {e.end}</span>
+                                {/if}
+
                             </div>
 
                             <!--{#if e.desc.length > 0}-->
@@ -78,14 +80,7 @@
 
                         </div>
                     </div>
-
-                </div>
             {/each}
-            <!-- todo {#if not events}-->
-            <!--    <span>Theres no events today! Enjoy a clear calendar!</span>-->
-            <!--{#if ecount = 0}-->
-            <!--    <span>no events :c</span>-->
-            <!--{/if}-->
 
         </div>
     </div>
