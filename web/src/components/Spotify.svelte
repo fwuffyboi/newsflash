@@ -18,7 +18,7 @@
 
     <!-- For when music is playing! -->
 {#if songName !== "Nothing is playing right now..." && nowPlaying }
-    <section class="h-60 flex flex-row gap-2">
+    <section class="h-60 max-w-250 flex flex-row gap-2">
 
         <!--        Now playing -->
         <div class="flex flex-col pr-1 text-right">
@@ -53,7 +53,7 @@
         <img class="h-full w-auto aspect-square rounded-lg" alt="The album cover for the album {albumName}" src={albumImg} id="aac" crossOrigin="anonymous" />
 
 <!--        Queue -->
-        <div class="flex flex-col w-50 bg-black rounded-md text-white">
+        <div class="flex flex-col w-50 rounded-md text-white">
             <span class="px-2 pb-0.5 font-black italic text-2xl">{m.spotify_up_next()}</span>
             <hr class="">
 

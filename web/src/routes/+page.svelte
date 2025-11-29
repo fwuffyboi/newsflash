@@ -9,6 +9,8 @@
     import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
     import ICalendar from "../components/ICalendar.svelte";
     import {getLocale} from "$lib/paraglide/runtime";
+    import FaceDetected from "../components/FaceDetected.svelte";
+    import WebcamTest from "../components/WebcamTest.svelte";
 
     let time: string = 'LOADING....';
     let activity = true;
@@ -74,27 +76,24 @@
         return () => {
             clearInterval(timeInterval);
             clearInterval(pingInterval);
-            if ('spotify' in enabled_apis) {
-                clearInterval(SpotifyInterval);
-            }
+            clearInterval(SpotifyInterval);
         }
     });
 
     // Ping the flask server every 3 seconds to see if the connection is active
     const pingMirrorAPI = () => {
-        try {
-            fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(2000) })
-                .then(response => response.json())
-                .then(data => {
-                    users_name = data.user_name;
-                    enabled_apis.pop()
-                    enabled_apis = data.enabled_apis
-                    console.log("enabled apis: ", enabled_apis);
-                })
-        } catch (e) {
-            enabled_apis = ['']
-            WebUIHalt = "WebUI HALTED. Network error! - Could not access /api/config on startup/page reload.";
-        }
+        fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(2000) })
+            .then(response => response.json())
+            .then(data => {
+                users_name = data.user_name;
+                enabled_apis.pop()
+                enabled_apis = data.enabled_apis
+                WebUIHalt = ""
+                console.log("enabled apis: ", enabled_apis);
+            }).catch(function(err) {
+                enabled_apis = ['']
+                WebUIHalt = "WebUI HALTED. Network error! - /api/config. Err: " + err;
+            })
 
         fetch("http://192.168.0.226:8080/ping", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
@@ -102,7 +101,6 @@
                 activityHTTPError = '';
             }).catch(function(err) {
                 console.log('Fetch Error: ', err);
-                activity = true;
                 if (err == "TypeError: NetworkError when attempting to fetch resource.") {
                     if (activityHTTPError !== "") {
                         activityHTTPError = ": Network error! - Could not ping API.";
@@ -111,8 +109,9 @@
                     activityHTTPError = (err);
                 }
 
-        });
-    }
+        })
+    };
+
     const getSpotifyNowPlayingData = () => {
         if (enabled_apis.includes('spotify')) {
             if (activity) {
@@ -175,8 +174,6 @@
                     })
             } else {
 
-                console.log("IJSANUMP");
-
                 // since activity is false, we can ignore actually returning real data.
                 spotifyFixedData = {
                     "title":       "Nothing is playing right now...",
@@ -197,8 +194,8 @@
         }
     }
 
-    const VERSION = "BETA-0.10.0";
-    const COPYRIGHT = "(C) MIT " + (new Date).getFullYear() + " Ashley Caramel";
+    const VERSION = "BETA-0.11.4";
+    const COPYRIGHT = "Copyright © MIT 2025 Ashley Caramel, fwuffyboi & Contributors.";
     const pageTitle = "NewsFlash Application"
 
 </script>
@@ -220,14 +217,14 @@
             <section class="flex flex-row justify-right items-end p-1 gap-2 animate-pulse text-white">
                 <CloudAlert />
                 <div class="flex flex-col">
-                    <span class="italic text-right ">{activityHTTPError}</span>
-                    <span class="italic text-right ">{WebUIHalt}</span>
+                    <span class="italic text-right">{activityHTTPError}</span>
+                    <span class="italic text-right">{WebUIHalt}</span>
                 </div>
             </section>
         {/if}
     </section>
     {#if activity}
-        <section class="flex flex-col justify-right items-end gap-5 pr-2">
+        <section class="flex flex-col justify-right items-end gap-3 pr-1">
             <!--Here, add all the nested components.
             Use svelte's html logic to check if that one should be active right now.-->
 
@@ -247,14 +244,14 @@
                 {#if enabled_apis.includes('tfl-trains')}
                     <TFLTrainStatuses />
                 {/if}
-
-                </div>
+            </div>
             {#if enabled_apis.includes('met-office-uk')}
                 <WeatherAlertUkMetOfficeUkMetOffice />
             {/if}
             {#if enabled_apis.includes('ical')}
                 <ICalendar />
             {/if}
+
         </section>
     {/if}
 
@@ -268,20 +265,16 @@
             <span class="italic">{COPYRIGHT}</span>
         </div>
 
-        <div class="w-23 h-23 bg-white rounded-sm">
-            <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
+        <div class="flex flex-row gap-2">
+            <div class="w-23 h-23 bg-white rounded-sm">
+                <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
+            </div>
+
+            <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-230 gap-5">
+                <span class="font-bold">{m.disclaimer()}</span>
+                <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
+            </div>
         </div>
 
-
-
-    </div>
-{/if}
-
-{#if activity}
-    <div class="text-right text-white fixed bottom-0 right-1.5 mb-0 w-190">
-        <div class="flex flex-col italic font-thin tracking-tighter animate-pulse">
-            <span class="font-bold">!!!! {m.disclaimer()} !!!!</span>
-            <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
-        </div>
     </div>
 {/if}

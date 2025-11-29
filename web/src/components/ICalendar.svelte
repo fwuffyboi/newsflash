@@ -50,7 +50,7 @@
     </div>
 
     <div class="flex flex-col rounded-lg pl-4 pb-4 pt-1 text-white">
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col">
 
             {#each events as e}
                 <div class="max-w-120">
@@ -58,7 +58,7 @@
                     <div class="{Coie(e.hasEnded)}">
                         <div class="flex flex-col">
                             <div class="flex flex-row justify-between pr-4">
-                                <span class="truncate">{e.title}</span>
+                                <span class="truncate font-semibold">{e.title}</span>
                                 <span>{e.start} - {e.end}</span>
                             </div>
 
@@ -69,12 +69,12 @@
                             <!--    </div>-->
                             <!--{/if}-->
 
-                            <!--{#if e.location.length > 0}-->
-                            <!--    <div class="flex flex-row line-clamp-2 italic font-thin">-->
-                            <!--        <span class="font-bold">{m.ical_location()}:&nbsp;</span>-->
-                            <!--        <span>{e.location}</span>-->
-                            <!--    </div>-->
-                            <!--{/if}-->
+                            {#if e.location.length > 0}
+                                <div class="flex flex-row line-clamp-2 italic font-thin tracking-tighter">
+<!--                                    <span class="font-semibold">{m.ical_location()}:&nbsp;</span>-->
+                                    <span>{e.location}</span>
+                                </div>
+                            {/if}
 
                         </div>
                     </div>
