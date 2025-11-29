@@ -13,17 +13,17 @@
     import WebcamTest from "../components/WebcamTest.svelte";
 
     let time: string = 'LOADING....';
-    let activity = true;
-    let activityHTTPError = '';
-    let WebUIHalt = '';
 
-    let enabled_apis: [string] = ['']
+    let time: string = $state('LOADING...'); // todo: translate
+    let activity = true;
+    let activityHTTPError = $state('');
+    let WebUIHalt = $state('');
+
+    let enabled_apis: [string] = $state(['']);
 
     let spotifyQueueList = [];
 
-    let users_name = 'User';
-
-    let spotifyFixedData = {
+    let spotifyFixedData = $state({
         "title":       "Loading...",
         "album":       "Loading...",
         "artists":     "Loading...",
@@ -38,9 +38,9 @@
 
         "queue":       [
             {
-                "artists": "Loading...",
+                "artists": "Loading...", // todo: translate this
                 "cover": "",
-                "track_name": "Loading...",
+                "track_name": "Loading...", // todo: translate this
             }]
     };
 
@@ -64,13 +64,14 @@
 
         updateTime();
         pingMirrorAPI();
+        updateTime();
 
         if ("spotify" in enabled_apis) {
             getSpotifyNowPlayingData();
         }
 
-        const timeInterval = setInterval(updateTime, 200);
-        const pingInterval = setInterval(pingMirrorAPI, 10000);
+        const timeInterval    = setInterval(updateTime, 200);
+        const pingInterval    = setInterval(pingMirrorAPI, 10000);
         const SpotifyInterval = setInterval(getSpotifyNowPlayingData, 3000);
 
         return () => {
@@ -85,11 +86,10 @@
         fetch("http://192.168.0.226:8080/api/config", { signal: AbortSignal.timeout(2000) })
             .then(response => response.json())
             .then(data => {
-                users_name = data.user_name;
                 enabled_apis.pop()
                 enabled_apis = data.enabled_apis
                 WebUIHalt = ""
-                console.log("enabled apis: ", enabled_apis);
+                // console.log("enabled apis: ", enabled_apis);
             }).catch(function(err) {
                 enabled_apis = ['']
                 WebUIHalt = "WebUI HALTED. Network error! - /api/config. Err: " + err;
@@ -118,14 +118,14 @@
                 fetch("http://192.168.0.226:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
                     .then(response => response.json())
                     .then(data => {
-                        console.log("spotify current data (playback):", data);
+                        // console.log("spotify current data (playback):", data);
 
                         // Create a temp list var for the queue and each track in it
                         // let spotifyQueueItem;
                         // let spotifyQueueList = {};
 
                         // check if the user has any playback
-                        if (data.error == "NPIF") {
+                        if (data.error === "NPIF") {
 
                             // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
                             spotifyFixedData = {
@@ -148,7 +148,7 @@
                         } else { // There __IS__ playback data. Populate the fixedData struct with the real data.
                             let spotifyQueueItem;
                             spotifyQueueList = [];
-                            console.log("data list:", data.data.next_tracks);
+                            // console.log("data list:", data.data.next_tracks);
 
                             for (spotifyQueueItem in data.data.next_tracks) {
                                 spotifyQueueList.push(data.data.next_tracks[spotifyQueueItem]);
@@ -169,7 +169,7 @@
 
                                 "queue":       spotifyQueueList
                             };
-                            console.log("spotify current data (queue):", spotifyQueueList);
+                            // console.log("spotify current data (queue):", spotifyQueueList);
                         }
                     })
             } else {
@@ -194,7 +194,7 @@
         }
     }
 
-    const VERSION = "BETA-0.11.4";
+    const VERSION = "BETA-0.14.2";
     const COPYRIGHT = "Copyright © MIT 2025 Ashley Caramel, fwuffyboi & Contributors.";
     const pageTitle = "NewsFlash Application"
 
@@ -230,10 +230,10 @@
 
             {#if enabled_apis.includes('spotify')}
                 <Spotify
-                        albumImg  = {spotifyFixedData.cover} albumName     = {spotifyFixedData.album}
-                        songName  = {spotifyFixedData.title} songArtists   ={spotifyFixedData.artists}
-                        nowPlaying={spotifyFixedData.is_playing} devicetype={spotifyFixedData.device_type}
-                        devicename={spotifyFixedData.device_name}     queue={spotifyFixedData.queue}
+                        albumImg   = {spotifyFixedData.cover}      albumName = {spotifyFixedData.album}
+                        songName   = {spotifyFixedData.title}    songArtists = {spotifyFixedData.artists}
+                        nowPlaying ={spotifyFixedData.is_playing} devicetype = {spotifyFixedData.device_type}
+                        devicename ={spotifyFixedData.device_name}     queue = {spotifyFixedData.queue}
                 />
             {/if}
             <div class="flex flex-row gap-2">
