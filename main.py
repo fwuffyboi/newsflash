@@ -2,6 +2,7 @@ import os, sys
 import time
 import logging
 
+from api.face import detect_face
 from api.geocoding import geocodeLocation
 from api.ical import get_calendar_events
 from api.met_office import GetCurrentWeatherWarningsMetOffice
@@ -33,7 +34,7 @@ logging.info("NewsFlash logger started. Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
-from flask import Flask, request, send_from_directory, send_file, redirect
+from flask import Flask, request, send_from_directory, send_file, redirect, flash, url_for
 from flask_cors import CORS
 
 from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality#, get_weather_forecast_simple
@@ -83,9 +84,9 @@ if __name__ == "__main__":
 
     # Log the loaded environment variables
     logging.info("Loaded the environment variables!")
-    logging.info("Geocoding user's location...")
 
     # Geocode users location
+    logging.info("Geocoding user's location...")
     if LOCATION == "OPTOUTLOC": # if user wishes to not give a location.
         LOCATION_COORDS = [0, 0]
         OPEN_WEATHER_ENABLED = False

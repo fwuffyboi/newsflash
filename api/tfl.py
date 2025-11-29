@@ -41,12 +41,12 @@ def all_train_status_tfl(logger):
 def get_set_bus_statuses_tfl(buses, logger):
     if not buses:
         logger.warning(f"No buses provided.")
-        return {"error": "", "data": {}}
+        return {"error": "No buses provided.", "data": {}}
 
     url = "https://api.tfl.gov.uk/Line/Mode/bus/Status"
 
     response = requests.get(url)
-    # todo: add caching (5min only)
+    # todo: add caching (10min only)
 
     bus_statuses_data = []
     buses = buses.split(',')
@@ -67,8 +67,6 @@ def get_set_bus_statuses_tfl(buses, logger):
                         bus_status_reason = "Good status."
 
                     bus_statuses_data.append({"bus_name": bus_name, "status_int": bus_status_no, "status": bus_status_reason})
-                else: # if not a match, skip the loop.
-                    continue
 
         return {"error": "", "data": bus_statuses_data}
 
