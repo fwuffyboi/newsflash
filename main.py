@@ -363,6 +363,36 @@ if __name__ == "__main__":
         return cag, 200
 
 
+    @app.route('/api/v1/face/', methods=['POST'])
+    def upload_file():
+
+        """
+            Accepts a multipart‑encoded image file.
+            Returns JSON.
+            """
+        if "file" not in request.files:
+            return {"error": "No file part"}, 400
+
+        file = request.files["file"]
+
+        if file.filename == "":
+            return {"error": "Empty filename"}, 400
+
+        # Read file into memory
+        img_bytes = file.read()
+        if not img_bytes:
+            return {"error": "Empty file"}, 400
+
+        try:
+            result = detect_face(img_bytes, logging)
+            # print(result)
+            if result["error"] != "":
+                return {"error": result["error"]}
+            return result
+        except Exception as e:
+            return {"error": str(e)}
+
+
     # Run the Flask app
     logging.info(f"Running NewsFlash Server on {HOST}:{PORT}...")
 
