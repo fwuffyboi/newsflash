@@ -128,7 +128,7 @@
 
     <div class="flex flex-row gap-2 ">
 
-        <span class="text-7xl animate-pulse">{temp_str}°</span>
+        <span class="text-7xl animate-pulse font-semibold">{temp_str}°</span>
 
         <div class="flex flex-col">
 
