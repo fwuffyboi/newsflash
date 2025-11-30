@@ -18,7 +18,7 @@ let canvasEl!: HTMLCanvasElement;
 let CameraStatus = $state("Connecting..."); // todo: translate
 let CameraResult = $state("...");
 let CameraFaces = $state(0);
-const CAMERA_CAPTURE_INTERVAL_MS = 5000;
+const CAMERA_CAPTURE_INTERVAL_MS = 3000;
 
 let time: string = $state('LOADING...'); // todo: translate
 
@@ -45,7 +45,7 @@ let spotifyFixedData = $state({
     "device_type": "Loading...",
     "duration_ms": 1000,
     "progress_ms": 0,
-    "is_playing":  true,
+    "is_playing":  false,
     "id":          "Loading...",
     "link":        "",
 
@@ -380,7 +380,7 @@ const pageTitle = "NewsFlash Application"
             <span class="italic">{COPYRIGHT}</span>
         </div>
 
-        <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180">
+        <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180 ml-24">
             <span class="font-bold">{m.disclaimer()}</span>
             <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
         </div>
@@ -397,6 +397,6 @@ const pageTitle = "NewsFlash Application"
     ></canvas>
 </div>
 
-<div class="w-23 h-23 bg-white rounded-sm fixed bottom-1 left-1 mb-0 animate-pulse">
+<div class="w-23 h-23 bg-white rounded-sm fixed bottom-1 left-1 mb-0">
     <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
 </div>
