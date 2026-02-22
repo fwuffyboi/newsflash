@@ -8,5 +8,5 @@
 		"pathPattern": "./messages/{locale}.json"
 	},
 	"baseLocale": "ie",
-	"locales": ["ie", "en", "ru", "pl"]
+	"locales": ["ie", "en", "ru", "pl", "shavian"]
 }

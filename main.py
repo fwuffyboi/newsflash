@@ -129,6 +129,7 @@ if __name__ == "__main__":
     @app.route("/")
     async def root():
         return redirect('/api/v1'), 303
+
     @app.route("/api/v1")
     async def api_v1_root():
         return {"message": f"This is the API endpoint for Newsflash. (C) MIT Copyright fwuffyboi / Ashley Caramel {time.strftime("%Y")}"}, 200
@@ -388,7 +389,7 @@ if __name__ == "__main__":
             # print(result)
             if result["error"] != "":
                 return {"error": result["error"]}
-            return result
+            return {'faces': 1, 'error': ''} # TEST/TODO
         except Exception as e:
             return {"error": str(e)}
 
