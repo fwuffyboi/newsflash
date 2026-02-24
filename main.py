@@ -126,14 +126,15 @@ if __name__ == "__main__":
         logging.error(error)
         return {"message": "Resource not found"}, 404
 
-
     @app.route("/")
     async def root():
         return redirect('/api/v1'), 303
 
-    @app.route("/api/v1")
+    @app.route("/api/v1/")
     async def api_v1_root():
-        return {"message": f"This is the API endpoint for Newsflash. (C) MIT Copyright fwuffyboi / Ashley Caramel {time.strftime("%Y")}"}, 200
+        return {"message": "This is the API endpoint for Newsflash.",
+                "copyright": f"(C) MIT Copyright fwuffyboi / Ashley Caramel {time.strftime("%Y")}"
+        }, 200
 
     @app.route("/api/warnings/")
     async def api_warnings():
