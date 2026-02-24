@@ -22,7 +22,7 @@ const CAMERA_CAPTURE_INTERVAL_MS = 3000;
 
 let time: string = $state('LOADING...'); // todo: translate
 
-const ACTIVITY_TIMEOUT = 15
+const ACTIVITY_TIMEOUT = 9
 let activity = $state(false);
 let activity_ttl = 0;
 
