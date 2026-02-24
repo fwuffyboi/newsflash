@@ -298,8 +298,8 @@ const getSpotifyNowPlayingData = () => {
     }
 }
 
-const VERSION = "BETA-0.14.2";
-const COPYRIGHT = "Copyright © MIT 2025 Ashley Caramel, fwuffyboi & Contributors.";
+const VERSION = "BETA-0.15.0";
+const COPYRIGHT = "© MIT 2025 Ashley Caramel (fwuffyboi) & Contributors.";
 const pageTitle = "NewsFlash Application"
 
 </script>
@@ -374,13 +374,13 @@ const pageTitle = "NewsFlash Application"
 
 {#if activity || activityHTTPError !== ''}
     <!-- Bottom right and left corners -->
-    <div class="text-white fixed bottom-1 left-1 mb-0">
+    <div class="text-white fixed bottom-1 left-1 mb-0 ml-24">
         <div class="flex flex-col">
             <span class="italic">{VERSION}</span>
             <span class="italic">{COPYRIGHT}</span>
         </div>
 
-        <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180 ml-24">
+        <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180">
             <span class="font-bold">{m.disclaimer()}</span>
             <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
         </div>
