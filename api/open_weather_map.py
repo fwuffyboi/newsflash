@@ -1,8 +1,11 @@
 # this file has all OpenWeatherMap API integrations in it.
 import logging
+import math
 from datetime import datetime
+from typing import Tuple, List
 
 import requests
+from PIL import Image
 
 
 def get_current_weather(api_key, location, language, logger):
@@ -172,9 +175,7 @@ def get_current_air_quality(api_key, location, logger):
     :return: A dictionary containing the current air quality data.
     """
 
-    ld = location
-
-    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/air_pollution?lat={location['coords'][0]}&lon={location['coords'][1]}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -201,32 +202,77 @@ def get_current_air_quality(api_key, location, logger):
         }
 
 
-# def rate_air_quality(air_response, logger):
-#     """Returns a worded rating based on the aqi value (e.g(s): Great!, Good, Moderate, Unhealthy, Hazardous"""
-#
-#     aqi_no = air_response['list'][0]['main']['aqi']
-#
-#     # Calculate the average aqi value
-#     if not aqi_no:
-#         logger.warning("No air quality data available.")
-#         return {"error": "No air quality data available.", "rating": "error"}, 500
-#
-#     # Determine the air quality rating based on the average aqi value
-#     if 0 < aqi_no <= 1:  # if aqi is between 0 and 1
-#         caq_rating = "Great!"
-#     elif 1 < aqi_no <= 2:  # if aqi is between 1 and 2
-#         caq_rating = "Good"
-#     elif 2 < aqi_no <= 3:  # if aqi is between 2 and 3
-#         caq_rating = "Moderate"
-#     elif 3 < aqi_no <= 4:  # if aqi is between 3 and 4
-#         caq_rating = "Unhealthy"
-#     elif 4 < aqi_no <= 5:  # if aqi is between 4 and 5
-#         caq_rating = "Hazardous"
-#     else:  # if aqi is greater than 5
-#         logger.error(f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.")
-#         return {
-#             "error": f"Air quality index is too high (over 5). This is likely an API error. AQI: {aqi_no}.",
-#             "rating": "error"
-#         }
-#
-#     return {"error": "", "rating": caq_rating}
+# def get_tile_img(api_key, location, logger):
+#     xtile, ytile = deg_to_tile(lat_deg=location['coords'][0], lon_deg=location['coords'][1], zoom=2)
+#     tileurl = tile_url(x=xtile, y=ytile, z=9, api_key=api_key)
+#     print(tileurl)
+#     tile = download_tile(tileurl)
+#     return tile
+
+
+
+def deg_to_tile(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[int, int]:
+    """
+    Convert latitude/longitude to tile x,y at a given zoom level.
+    Formula from the OpenStreetMap wiki.
+    """
+    lat_rad = math.radians(lat_deg)
+    n = 2.0 ** zoom
+    xtile = int((lon_deg + 180.0) / 360.0 * n)
+    ytile = int(
+        (1.0 - math.log(math.tan(lat_rad) + 1 / math.cos(lat_rad)) / math.pi) /
+        2.0 * n
+    )
+    return xtile, ytile
+
+
+def tile_url(z: int, x: int, y: int, api_key) -> str:
+    """Return the URL for a single satellite tile."""
+    return f"https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid={api_key}"
+
+
+def download_tile(url: str) -> Image.Image:
+    """Download one tile and return it as a PIL image."""
+    r = requests.get(url, timeout=10)
+    r.raise_for_status()
+    return Image.open(r.content)
+
+
+def tiles_in_bbox(bbox: Tuple[float, float, float, float], zoom: int) -> List[Tuple[int, int]]:
+    min_lon, min_lat, max_lon, max_lat = bbox
+
+    # Convert corners to tile indices
+    x_min, y_max = deg_to_tile(min_lat, min_lon, zoom)
+    x_max, y_min = deg_to_tile(max_lat, max_lon, zoom)
+
+    tiles = []
+    for x in range(x_min, x_max + 1):
+        for y in range(y_min, y_max + 1):
+            tiles.append((x, y))
+    return tiles
+
+
+def fetch_and_stitch(bbox: Tuple[float, float, float, float], zoom: int) -> Image.Image:
+    tile_coords = tiles_in_bbox(bbox, zoom)
+
+    # Determine size of final image
+    width_tiles = max(x for x, _ in tile_coords) - min(x for x, _ in tile_coords) + 1
+    height_tiles = max(y for _, y in tile_coords) - min(y for _, y in tile_coords) + 1
+
+    final_img = Image.new("RGB", (width_tiles * 256, height_tiles * 256))
+
+    for idx, (x, y) in enumerate(tile_coords):
+        url = tile_url(zoom, x, y)
+        try:
+            tile_img = download_tile(url)
+        except Exception as e:
+            print(f"Failed to fetch {url}: {e}")
+            continue
+
+        # Paste into final image
+        px = (x - min(x for x, _ in tile_coords)) * 256
+        py = (y - min(y for _, y in tile_coords)) * 256
+        final_img.paste(tile_img, (px, py))
+
+    return final_img
+
