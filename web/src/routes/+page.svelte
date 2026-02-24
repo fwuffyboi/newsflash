@@ -315,7 +315,7 @@ const pageTitle = "NewsFlash Application"
 
         {#if activity || activityHTTPError !== ''}
             <div class="flex flex-row">
-                <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus} Timeout={activity_ttl}/>
+                <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus} Timeout={ACTIVITY_TIMEOUT}/>
                 <span class="font-[Funnel_Display] font-bold text-5xl">{time}</span>
             </div>
         {/if}

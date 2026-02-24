@@ -24,7 +24,7 @@ function StatusFunc() {
         <div class="flex flex-row gap-1">
             <span>Status:</span>
             <span class="{StatusFunc()} animate-pulse">{Status}</span>
-            <span>TTE: {Timeout-Math.floor(Date.now() / 1000)}</span>
+            <span>TtAE: {Timeout}</span>
         </div>
     </div>
 

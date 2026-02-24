@@ -7,6 +7,6 @@
 	"plugin.inlang.messageFormat": {
 		"pathPattern": "./messages/{locale}.json"
 	},
-	"baseLocale": "ie",
-	"locales": ["ie", "en", "ru", "pl", "shavian"]
+	"baseLocale": "Shavian",
+	"locales": ["Gaeilge", "English", "Русский", "Polski", "Shavian"]
 }
