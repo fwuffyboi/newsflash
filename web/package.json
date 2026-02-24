@@ -34,6 +34,6 @@
 		"@bwip-js/browser": "^4.7.0",
 		"@inlang/paraglide-js": "^2.0.0",
 		"bwip-js": "^4.7.0",
-		"lucide-svelte": "^0.542.0",
+		"lucide-svelte": "^0.542.0"
 	}
 }
