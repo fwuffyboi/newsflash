@@ -8,6 +8,8 @@ from api.ical import get_calendar_events
 from api.met_office import GetCurrentWeatherWarningsMetOffice
 from api.spotify import get_next_4_tracks_spotify
 
+VERSION = "Beta-1.0.0"
+
 # Set up logging
 rootLogger = logging.getLogger()
 
@@ -33,6 +35,7 @@ consoleHandler.setFormatter(logFormatter)
 logging.info("NewsFlash logger started.")
 # logging.info("Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
+logging.info(f"NewsFlash. Version {VERSION}")
 
 from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory, send_file, redirect, flash, url_for
