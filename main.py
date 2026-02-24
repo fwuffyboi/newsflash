@@ -12,11 +12,9 @@ from api.spotify import get_next_4_tracks_spotify
 rootLogger = logging.getLogger()
 
 # Set log file details, these will probably become .env variables someday, sooo... TODO
-logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
-logFileName = f'newsflash-{logFileTime}.log'
-logFilePath = "./logs"
-f = open(f"{logFilePath}/{logFileName}", mode="x")
-f.close()
+# logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
+# logFileName = f'newsflash-{logFileTime}.log'
+# logFilePath = "logs"
 
 # Configure the logging format
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -27,12 +25,13 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
 
 # So logs can also go to a file
-fileHandler = logging.FileHandler(f"{logFilePath}/{logFileName}")
-fileHandler.setFormatter(logFormatter)
-rootLogger.addHandler(fileHandler)
+# fileHandler = logging.FileHandler(f"{logFilePath}/{logFileName}")
+# fileHandler.setFormatter(logFormatter)
+# rootLogger.addHandler(fileHandler)
 
 # Initiate everything else after we have done logging
-logging.info("NewsFlash logger started. Log file created: %s", logFileName)
+logging.info("NewsFlash logger started.")
+# logging.info("Log file created: %s", logFileName)
 logging.info("Starting NewsFlash application...")
 
 from dotenv import load_dotenv
