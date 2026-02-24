@@ -10,7 +10,7 @@ import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetO
 import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
 import ICalendar from "../components/ICalendar.svelte";
 import {getLocale} from "$lib/paraglide/runtime";
-import Hello from "../components/Hello.svelte";
+// import Hello from "../components/Hello.svelte";
 import FaceInfoWidget from "../components/FaceInfoWidget.svelte";
 
 let videoEl!: HTMLVideoElement;
@@ -26,8 +26,8 @@ const ACTIVITY_TIMEOUT = 9
 let activity = $state(false);
 let activity_ttl = 0;
 
-let greetingActive = $state(false);
-let greetingBool = $state(true);
+// let greetingActive = $state(false);
+// let greetingBool = $state(true);
 
 let activityHTTPError = $state('');
 let WebUIHalt = $state('');
@@ -364,11 +364,11 @@ const pageTitle = "NewsFlash Application"
     {/if}
 
     <!--todo: make this show for 2 or 3 seconds when the mirror sees the user, as well as when the timeout ends-->
-    {#if greetingActive}
-        <div class="flex flex-col h-screen justify-center items-center">
-            <Hello greeting={greetingBool}/>
-        </div>
-    {/if}
+    <!--{#if greetingActive}-->
+    <!--    <div class="flex flex-col h-screen justify-center items-center">-->
+    <!--        <Hello greeting={greetingBool}/>-->
+    <!--    </div>-->
+    <!--{/if}-->
 
 </div>
 
@@ -385,6 +385,10 @@ const pageTitle = "NewsFlash Application"
             <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
         </div>
     </div>
+
+    <div class="w-23 h-23 bg-white rounded-sm fixed bottom-1 left-1 mb-0">
+        <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
+    </div>
 {/if}
 
 <div class="hidden">
@@ -397,6 +401,4 @@ const pageTitle = "NewsFlash Application"
     ></canvas>
 </div>
 
-<div class="w-23 h-23 bg-white rounded-sm fixed bottom-1 left-1 mb-0">
-    <canvas class="w-full h-full aspect-square p-1" id="dmcanvas" ></canvas>
-</div>
+
