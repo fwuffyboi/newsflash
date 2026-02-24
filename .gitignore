@@ -4,7 +4,6 @@
 *.env
 *.pyc
 *.iml
-*.xml
 *.pyc
 *.log
 .cache
