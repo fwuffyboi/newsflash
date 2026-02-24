@@ -130,10 +130,26 @@ if __name__ == "__main__":
     async def root():
         return redirect('/api/v1'), 303
 
+    @app.route("/license")
+    async def license_route():
+        txt=""
+        with open("LICENSE", "r") as f:
+            txt=f.read()
+
+        return str(txt), 200
+
     @app.route("/api/v1/")
     async def api_v1_root():
-        return {"message": "This is the API endpoint for Newsflash.",
-                "copyright": f"(C) MIT Copyright fwuffyboi / Ashley Caramel {time.strftime("%Y")}"
+        return {
+            "message": "This is the API endpoint for Newsflash.",
+            "copyright": f"(C) MIT Copyright fwuffyboi / Ashley Caramel {time.strftime("%Y")}",
+            "routes": [
+                "/api/v1/", "/license", "/api/warnings", "/api/config", "/api/v1/spotify/now-playing/",
+                "/api/v1/transport/tfl/train-status/", "/api/v1/transport/tfl/bus-status/", "/ping",
+                "/api/v1/weather/current/", "/api/v1/weather/forecast/", "/api/v1/weather/warnings/",
+                "/api/v1/air-quality/current/", "/api/v1/ical/", "/api/v1/face/"
+
+            ],
         }, 200
 
     @app.route("/api/warnings/")
@@ -239,6 +255,8 @@ if __name__ == "__main__":
     # logging routes
     @app.route("/logs/")
     async def get_logs():
+        return "Not supported.", 501
+
         # Find all log files in the current directory
         log_files = [f for f in os.listdir('./logs') if f.startswith('newsflash-') and f.endswith('.log')]
         if not log_files:
@@ -251,6 +269,7 @@ if __name__ == "__main__":
     
     @app.route("/logs/<log_file_name>/")
     async def get_log_file(log_file_name):
+        return "Not supported.", 501
 
         # Check if the requested log file exists
         if not os.path.exists(log_file_name):
@@ -266,6 +285,7 @@ if __name__ == "__main__":
     
     @app.route("/logs/latest/")
     async def get_latest_logs():
+        return "Not supported.", 501
 
         # Open the latest log file and return the last 1000 lines as plain text
         try:
