@@ -8,7 +8,7 @@ from api.ical import get_calendar_events
 from api.met_office import GetCurrentWeatherWarningsMetOffice
 from api.spotify import get_next_4_tracks_spotify
 
-VERSION = "Beta-1.0.0"
+VERSION = "Beta-1.1.0"
 
 # Set up logging
 rootLogger = logging.getLogger()

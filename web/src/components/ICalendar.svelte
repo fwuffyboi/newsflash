@@ -17,7 +17,7 @@
     ]);
     let ecount = $derived(events.length);
     let message = $state();
-    let d = new Date();
+    // let d = new Date();
 
     onMount(() => {
         fetch("http://localhost:4000/api/v1/ical/", { signal: AbortSignal.timeout(8000) })
@@ -45,7 +45,9 @@
 
     <div class="pt-2 px-3 pb-1 flex flex-row text-white font-bold text-lg ">
         <CalendarFold size="25" />
-        <span class="pl-1 underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>
+<!--        <span class="pl-1 underline">{m.ical_today()}, {d.getDate()} {d.toLocaleString(getLocale(), { month: 'long' })} {d.getFullYear()}</span>-->
+        <span class="pl-1 underline">{m.ical_today()}</span>
+
 
     </div>
 
