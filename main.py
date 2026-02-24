@@ -391,7 +391,7 @@ if __name__ == "__main__":
 
 
     @app.route('/api/v1/face/', methods=['POST'])
-    def upload_file():
+    def face_upload_file():
 
         """
             Accepts a multipart‑encoded image file.

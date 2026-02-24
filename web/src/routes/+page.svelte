@@ -315,7 +315,7 @@ const pageTitle = "NewsFlash Application"
 
         {#if activity || activityHTTPError !== ''}
             <div class="flex flex-row">
-                <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus}/>
+                <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus} Timeout={activity_ttl}/>
                 <span class="font-[Funnel_Display] font-bold text-5xl">{time}</span>
             </div>
         {/if}
@@ -376,8 +376,8 @@ const pageTitle = "NewsFlash Application"
     <!-- Bottom right and left corners -->
     <div class="text-white fixed bottom-1 left-1 mb-0 ml-24">
         <div class="flex flex-col">
-            <span class="italic">{VERSION}</span>
-            <span class="italic">{COPYRIGHT}</span>
+            <span class="italic -ml-24">{VERSION}</span>
+            <span class="italic fixed">{COPYRIGHT}</span>
         </div>
 
         <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180">

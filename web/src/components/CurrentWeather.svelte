@@ -19,7 +19,6 @@
     let temp_str =   $state('??');
     let wind =       $state(7.77);
     let icon =       $state("01d");
-    let unit =      $state("Unknown");
 
     let bg_gradient = $state("")
     let lucide_icon = $state("")
