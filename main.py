@@ -179,6 +179,7 @@ if __name__ == "__main__":
             return {
                 "error": "",
                 "user_name": USERS_NAME,
+                "api_version": VERSION,
                 "enabled_apis": enabled_apis
             }
         except Exception as e:
