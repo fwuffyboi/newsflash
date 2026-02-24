@@ -1,7 +1,7 @@
 {
-	"name": "web",
+	"name": "newsflashweb",
 	"private": true,
-	"version": "0.0.1",
+	"version": "1.0.",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -35,6 +35,5 @@
 		"@inlang/paraglide-js": "^2.0.0",
 		"bwip-js": "^4.7.0",
 		"lucide-svelte": "^0.542.0",
-		"to-shavian": "^0.3.1"
 	}
 }
