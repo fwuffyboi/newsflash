@@ -24,7 +24,7 @@
     let lucide_icon = $state("")
 
     onMount(() => {
-        fetch("http://localhost:8080/api/v1/weather/current/", { signal: AbortSignal.timeout(5000) })
+        fetch("http://localhost:4000/api/v1/weather/current/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
                 // console.log(data);
@@ -72,7 +72,7 @@
             });
 
         // Secondly, get the amount of weather alerts
-        fetch("http://localhost:8080/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
+        fetch("http://localhost:4000/api/v1/weather/warnings/", { signal: AbortSignal.timeout(5000) })
             .then(response => response.json())
             .then(data => {
                 alerts_int = data.warnings.length;

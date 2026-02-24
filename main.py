@@ -41,7 +41,8 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory, send_file, redirect, flash, url_for
 from flask_cors import CORS
 
-from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality#, get_weather_forecast_simple
+from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality, \
+    get_tile_img  # , get_weather_forecast_simple
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 
@@ -330,6 +331,9 @@ if __name__ == "__main__":
             return {"error": "Could not get forecasted weather data. Please check the logs.", "data": {}}
         return {"error": "", "data": resp["data"]}, 200
 
+    @app.route("/api/v1/weather/tile/")
+    async def get_weather_tile():
+        return get_tile_img(location=LOCATION_COORDS, api_key=OPEN_WEATHER_API_KEY, logger=logging)
 
     # @app.route("/api/v1/weather/forecast/simple/")
     # async def get_weather_forecast_simple_flask():

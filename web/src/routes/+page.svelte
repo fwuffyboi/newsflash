@@ -86,7 +86,7 @@ async function captureAndSend() {
 
         try {
             CameraStatus = "Processing...";
-            const resp = await fetch("http://localhost:8080/api/v1/face", {
+            const resp = await fetch("http://localhost:4000/api/v1/face", {
                 method: "POST",
                 body: formData,
             });
@@ -187,7 +187,7 @@ onMount(() => {
 
 // Ping the flask server every 3 seconds to see if the connection is active
 const pingMirrorAPI = () => {
-    fetch("http://localhost:8080/api/config", { signal: AbortSignal.timeout(2000) })
+    fetch("http://localhost:4000/api/config", { signal: AbortSignal.timeout(2000) })
         .then(response => response.json())
         .then(data => {
             enabled_apis.pop()
@@ -199,7 +199,7 @@ const pingMirrorAPI = () => {
             WebUIHalt = "WebUI HALTED. Network error! - /api/config. Err: " + err;
         })
 
-    fetch("http://localhost:8080/ping", { signal: AbortSignal.timeout(5000) })
+    fetch("http://localhost:4000/ping", { signal: AbortSignal.timeout(5000) })
         .then(response => response.json())
         .then(data => {
             activityHTTPError = '';
@@ -219,7 +219,7 @@ const pingMirrorAPI = () => {
 const getSpotifyNowPlayingData = () => {
     if (enabled_apis.includes('spotify')) {
         if (activity) {
-            fetch("http://localhost:8080/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
+            fetch("http://localhost:4000/api/v1/spotify/now-playing", { signal: AbortSignal.timeout(5000) })
                 .then(response => response.json())
                 .then(data => {
                     // console.log("spotify current data (playback):", data);

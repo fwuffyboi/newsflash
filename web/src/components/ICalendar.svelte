@@ -20,7 +20,7 @@
     let d = new Date();
 
     onMount(() => {
-        fetch("http://localhost:8080/api/v1/ical/", { signal: AbortSignal.timeout(8000) })
+        fetch("http://localhost:4000/api/v1/ical/", { signal: AbortSignal.timeout(8000) })
             .then(response => response.json())
             .then(data => {
 
