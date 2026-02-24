@@ -15,6 +15,8 @@ rootLogger = logging.getLogger()
 logFileTime = str(time.strftime("%Y-%m-%d_%H-%M-%S"))
 logFileName = f'newsflash-{logFileTime}.log'
 logFilePath = "./logs"
+f = open(f"{logFilePath}/{logFileName}", mode="x")
+f.close()
 
 # Configure the logging format
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,7 +27,7 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
 
 # So logs can also go to a file
-fileHandler = logging.FileHandler("{0}/{1}".format(logFilePath, logFileName))
+fileHandler = logging.FileHandler(f"{logFilePath}/{logFileName}")
 fileHandler.setFormatter(logFormatter)
 rootLogger.addHandler(fileHandler)
 
