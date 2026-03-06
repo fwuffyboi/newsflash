@@ -1,6 +1,7 @@
 # this file has all met office integrations in it.
 import feedparser
 
+
 def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     """
     Scrapes potential weather warnings from the Met Office RSS list.
@@ -16,7 +17,6 @@ def GetCurrentWeatherWarningsMetOffice(uk_region, logger):
     except Exception as e:
         logger.error(f"Attempt to get weather warnings failed. Error: feedparser e:{e.__traceback__}")
         return {"error": e, "warnings": []}
-
 
     warnings = []
 
