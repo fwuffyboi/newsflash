@@ -1,14 +1,14 @@
 <script>
 
     import {m} from "$lib/paraglide/messages.js"
-    import {LaptopMinimal, Smartphone, Speaker} from "lucide-svelte";
+    import {Laptop, Smartphone, Speaker} from "lucide-svelte";
 
     let { songName, songArtists, albumName, albumImg, nowPlaying = true, devicetype, devicename, queue = []} = $props();
 
 </script>
 
     <!-- When music is NOT playing -->
-{#if songName === "Nothing is playing right now..." || !nowPlaying }
+{#if !nowPlaying }
     <section class="h-12 flex flex-row">
         <div class="flex flex-col pr-4 text-gray-200 text-right">
             <span class="font-bold text-4xl italic tracking-tight animate-pulse line-clamp-3">{m.spotify_nothing_is_playing()}</span>
@@ -17,11 +17,11 @@
 {/if}
 
     <!-- For when music is playing! -->
-{#if songName !== "Nothing is playing right now..." && nowPlaying }
+{#if songName !== "Loading..." && nowPlaying }
     <section class="h-60 max-w-250 flex flex-row gap-2">
 
         <!--        Now playing -->
-        <div class="flex flex-col pr-1 text-right">
+        <div class="flex flex-col text-right">
 
             <!-- Song name -->
             <div class="flex flex-col gap-2 text-white text-right ml-auto">
@@ -30,9 +30,9 @@
                 <div class="flex flex-row gap-1 ml-auto text-green-500">
 
                     {#if devicetype==="Computer"}
-                        <LaptopMinimal/>
+                        <Laptop/>
                     {:else if devicetype==="Smartphone"}
-                            <Smartphone/>
+                        <Smartphone/>
                     {:else}
                         <Speaker/>
                     {/if}
@@ -71,5 +71,23 @@
 
         </div>
 
+    </section>
+{/if}
+
+
+{#if songName === "Loading..." && nowPlaying }
+    <section class="h-60 max-w-250 flex flex-row gap-2 pr-5">
+
+        <!--        Loading just before initiation -->
+        <div class="flex flex-col text-right">
+
+            <!-- Song name -->
+            <span class="font-light text-gray-300 italic tracking-tight animate-pulse mt-auto">{m.spotify_now_playing()}</span>
+            <span class="font-bold text-white text-4xl italic tracking-tight text-balance overflow-ellipsis line-clamp-2">{songName}</span>
+
+            <!-- Artist name -->
+            <span class="text-2xl text-white font-thin overflow-ellipsis line-clamp-2">{songArtists}</span>
+
+        </div>
     </section>
 {/if}

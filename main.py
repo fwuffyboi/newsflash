@@ -5,7 +5,7 @@ import logging
 from api.face import detect_face
 from api.geocoding import geocodeLocation
 from api.ical import get_calendar_events
-from api.met_office import GetCurrentWeatherWarningsMetOffice
+from api.mo_weather_alert import GetCurrentWeatherWarningsMetOffice
 from api.spotify import get_next_4_tracks_spotify
 
 VERSION = "Beta-1.1.0"
@@ -41,7 +41,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, send_from_directory, send_file, redirect, flash, url_for
 from flask_cors import CORS
 
-from api.open_weather_map import get_current_weather, get_weather_forecast, get_current_air_quality # , get_weather_forecast_simple
+from api.weather import get_current_weather, get_weather_forecast, get_current_air_quality # , get_weather_forecast_simple
 from api.tfl import all_train_status_tfl, get_set_bus_statuses_tfl
 
 

@@ -1,7 +1,7 @@
 {
 	"name": "newsflashweb",
 	"private": true,
-	"version": "1.0.",
+	"version": "BETA-0.17.2",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

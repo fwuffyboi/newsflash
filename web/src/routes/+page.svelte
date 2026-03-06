@@ -11,6 +11,7 @@ import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
 import ICalendar from "../components/ICalendar.svelte";
 import {getLocale} from "$lib/paraglide/runtime";
 import FaceInfoWidget from "../components/FaceInfoWidget.svelte";
+import SimpleHello from "../components/SimpleHello.svelte";
 
 let videoEl!: HTMLVideoElement;
 let canvasEl!: HTMLCanvasElement;
@@ -35,21 +36,21 @@ let enabled_apis: [string] = $state(['']);
 let spotifyQueueList = [];
 
 let spotifyFixedData = $state({
-    "title":       "Loading...", // todo: translate this
+    "title":       "Loading...",
     "album":       "Loading...",
-    "artists":     "Loading...", // todo: translate this
+    "artists":     "Loading...",
     "cover":       "",
-    "device_name": "Loading...", // todo: translate this
+    "device_name": "Loading...",
     "device_type": "Loading...",
     "duration_ms": 1000,
     "progress_ms": 0,
-    "is_playing":  false,
+    "is_playing":  true,
     "id":          "Loading...",
     "link":        "",
 
     "queue":       [
         {
-            "artists": "Loading...", // todo: translate this
+            "artists": "Loading...",
             "cover": "",
             "track_name": "Loading...", // todo: translate this
         }]
@@ -117,7 +118,6 @@ async function captureAndSend() {
 }
 
 function ActivityCountdown () {
-    let t = new Date();
 
     if (activity) {
 
@@ -153,23 +153,22 @@ onMount(() => {
     }
 
     startCamera();
-    pingMirrorAPI();
+    MirrorAPIConfig();
     updateTime();
 
     if ("spotify" in enabled_apis) {
         getSpotifyNowPlayingData();
     }
 
-    const timeInterval    = setInterval(updateTime, 200);
-    const pingInterval    = setInterval(pingMirrorAPI, 10000);
-    const SpotifyInterval = setInterval(getSpotifyNowPlayingData, 3000);
-    const CameraInterval  = setInterval(captureAndSend, CAMERA_CAPTURE_INTERVAL_MS);
+    const timeInterval     = setInterval(updateTime, 200);
+    const configInterval   = setInterval(MirrorAPIConfig, 10000);
+    const SpotifyInterval  = setInterval(getSpotifyNowPlayingData, 3000);
+    const CameraInterval   = setInterval(captureAndSend, CAMERA_CAPTURE_INTERVAL_MS);
     const ActivityInterval = setInterval(ActivityCountdown, 500);
-
 
     return () => {
         clearInterval(timeInterval);
-        clearInterval(pingInterval);
+        clearInterval(configInterval);
         clearInterval(SpotifyInterval);
         clearInterval(CameraInterval);
         clearInterval(ActivityInterval);
@@ -183,8 +182,8 @@ onMount(() => {
 });
 
 // Ping the flask server every 3 seconds to see if the connection is active
-const pingMirrorAPI = () => {
-    fetch("http://localhost:4000/api/config", { signal: AbortSignal.timeout(2000) })
+const MirrorAPIConfig = () => {
+    fetch("http://localhost:4000/api/config", { signal: AbortSignal.timeout(5000) })
         .then(response => response.json())
         .then(data => {
             enabled_apis.pop()
@@ -197,21 +196,21 @@ const pingMirrorAPI = () => {
             WebUIHalt = "WebUI HALTED. Network error! - /api/config. Err: " + err;
         })
 
-    fetch("http://localhost:4000/ping", { signal: AbortSignal.timeout(5000) })
-        .then(response => response.json())
-        .then(data => {
-            activityHTTPError = '';
-        }).catch(function(err) {
-            console.log('Fetch Error: ', err);
-            if (err == "TypeError: NetworkError when attempting to fetch resource.") {
-                if (activityHTTPError !== "") {
-                    activityHTTPError = ": Network error! - Could not ping API.";
-                }
-            } else {
-                activityHTTPError = (err);
-            }
-
-    })
+    // fetch("http://localhost:4000/ping", { signal: AbortSignal.timeout(5000) })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         activityHTTPError = '';
+    //     }).catch(function(err) {
+    //         console.log('Fetch Error: ', err);
+    //         if (err == "TypeError: NetworkError when attempting to fetch resource.") {
+    //             if (activityHTTPError !== "") {
+    //                 activityHTTPError = ": Network error! - Could not ping API.";
+    //             }
+    //         } else {
+    //             activityHTTPError = (err);
+    //         }
+    //
+    // })
 };
 
 const getSpotifyNowPlayingData = () => {
@@ -231,7 +230,7 @@ const getSpotifyNowPlayingData = () => {
 
                         // There __IS NOT__ playback data. Populate the fixedData struct with FAKE data.
                         spotifyFixedData = {
-                            "title":       "Nothing is playing right now...",
+                            "title":       "Loading...",
                             "album":       "",
                             "artists":     "",
                             "cover":       "",
@@ -239,7 +238,7 @@ const getSpotifyNowPlayingData = () => {
                             "device_type": "",
                             "duration_ms": 0,
                             "progress_ms": 0,
-                            "is_playing":  false,
+                            "is_playing":  true,
                             "id":          "",
                             "link":        "",
 
@@ -278,15 +277,15 @@ const getSpotifyNowPlayingData = () => {
 
             // since activity is false, we can ignore actually returning real data.
             spotifyFixedData = {
-                "title":       "Nothing is playing right now...",
+                "title":       "Loading...",
                 "album":       "",
-                "artists":     "",
+                "artists":     "Checking spotify data...",
                 "cover":       "",
                 "device_name": "",
                 "device_type": "",
                 "duration_ms": 0,
                 "progress_ms": 0,
-                "is_playing":  false,
+                "is_playing":  true,
                 "id":          "",
                 "link":        "",
 
@@ -296,7 +295,7 @@ const getSpotifyNowPlayingData = () => {
     }
 }
 
-const VERSION = "BETA-0.17.0";
+const VERSION = "BETA-0.18.1";
 const COPYRIGHT = "© MIT 2025 Ashley Caramel (fwuffyboi) & Contributors.";
 const pageTitle = "NewsFlash Application"
 
@@ -304,7 +303,7 @@ const pageTitle = "NewsFlash Application"
 
 <svelte:head>
 	<title>{pageTitle}</title>
-	<meta name="description" content="The NewsFlash application." />
+	<meta name="description" content="Ashley's shitty smart mirror project!." />
 </svelte:head>
 
 
@@ -316,12 +315,12 @@ const pageTitle = "NewsFlash Application"
         {#if activity || activityHTTPError !== ''}
             <div class="flex flex-col text-right">
                 <div class="flex flex-row">
-<!--                    <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus} Timeout={ACTIVITY_TIMEOUT}/>-->
-                    <span class="font-[Funnel_Display] font-bold text-5xl">{time}</span>
+                    <FaceInfoWidget FaceDetected={CameraResult} FaceNo={CameraFaces} Status={CameraStatus} Timeout={ACTIVITY_TIMEOUT}/>
+                    <div class="flex flex-col">
+                        <span class="font-[Funnel_Display] font-bold text-5xl">{time}</span>
+                        <SimpleHello />
+                    </div>
                 </div>
-
-                <span class="font-normal underline text-right text-lg">{new Date().getDate()} {new Date().toLocaleString(getLocale(), { month: 'long' })} {new Date().getFullYear()}</span>
-
             </div>
         {/if}
 
@@ -382,7 +381,7 @@ const pageTitle = "NewsFlash Application"
 
         <div class="flex flex-col italic font-thin tracking-tighter animate-pulse w-180">
             <span class="font-bold">{m.disclaimer()}</span>
-            <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>
+<!--            <span class="font-medium">{m.locale_visit()}<a href="/locale">/locale</a>. {m.locale_current({ locale: getLocale() })}</span>-->
         </div>
     </div>
 
@@ -391,7 +390,7 @@ const pageTitle = "NewsFlash Application"
 <!--    </div>-->
 {/if}
 
-<div class="hidden">
+<div class="">
     <video bind:this={videoEl} autoplay playsinline><track kind="captions" src=""></video>
     <canvas
             bind:this={canvasEl}
