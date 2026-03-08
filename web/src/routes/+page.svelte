@@ -294,7 +294,7 @@ const getSpotifyNowPlayingData = () => {
     }
 }
 
-const VERSION = "BETA-0.18.1";
+const VERSION = "BETA-0.23.2";
 const COPYRIGHT = "© MIT 2025 Ashley Caramel (fwuffyboi) & Contributors.";
 const pageTitle = "NewsFlash Application"
 

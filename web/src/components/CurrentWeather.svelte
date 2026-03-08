@@ -82,7 +82,7 @@
 </script>
 
 
-<section class="flex flex-col min-w-75 max-w-110 h-70 rounded-xl grad p-4 {bg_gradient} text-white">
+<section class="flex flex-col min-w-75 max-w-110 h-70 rounded-2xl grad p-4 font-sans {bg_gradient} text-white">
 
     <div class="flex flex-row gap-2 text-lg">
         <div class="flex flex-col">

@@ -9,8 +9,8 @@
 
     <!-- When music is NOT playing -->
 {#if !nowPlaying }
-    <section class="h-12 flex flex-row">
-        <div class="flex flex-col pr-4 text-gray-200 text-right">
+    <section class="h-11 flex flex-row font-sans">
+        <div class="flex pr-3 text-gray-200 text-right">
             <span class="font-bold text-4xl italic tracking-tight animate-pulse line-clamp-3">{m.spotify_nothing_is_playing()}</span>
         </div>
     </section>
@@ -18,14 +18,14 @@
 
     <!-- For when music is playing! -->
 {#if songName !== "Loading..." && nowPlaying }
-    <section class="h-60 max-w-250 flex flex-row gap-2">
+    <section class="h-60 max-w-250 flex flex-row gap-2 font-sans">
 
         <!--        Now playing -->
         <div class="flex flex-col text-right">
 
             <!-- Song name -->
             <div class="flex flex-col gap-2 text-white text-right ml-auto">
-                <img class="w-11 ml-auto" src="/spotify_logo_white.svg" alt="">
+                <img class="w-10 ml-auto" src="/spotify_logo_white.svg" alt="">
 
                 <div class="flex flex-row gap-1 ml-auto text-green-500">
 
@@ -43,7 +43,7 @@
             </div>
 
             <span class="font-light text-gray-300 italic tracking-tight animate-pulse mt-auto">{m.spotify_now_playing()}</span>
-            <span class="font-bold text-white text-4xl italic tracking-tight text-balance overflow-ellipsis line-clamp-2">{songName}</span>
+            <span class="font-bold text-white text-4xl tracking-tight text-balance overflow-ellipsis line-clamp-2 pr-0.5">{songName}</span>
 
             <!-- Artist name -->
             <span class="text-2xl text-white font-thin overflow-ellipsis line-clamp-2">{songArtists}</span>
@@ -57,13 +57,13 @@
             <hr class="">
 
             {#each queue as q}
-                <div class="flex flex-row gap-1 px-1 truncate mask-x-from-90%">
+                <div class="flex flex-row gap-1 px-1 truncate">
                     <div class="max-w-10 pt-2 aspect-square">
-                        <img class="mask-y-from-90% mask-x-from-90% rounded-sm" src={q.cover} alt="">
+                        <img class="mask-y-from-92% mask-x-from-92% rounded-md" src={q.cover} alt="">
                     </div>
-                    <div class="pt-0.5 flex flex-col truncate">
-                        <span class="font-semibold">{q.track_name}</span>
-                        <span class="italic">{q.artists}</span>
+                    <div class="flex flex-col truncate">
+                        <span class="font-bold">{q.track_name}</span>
+                        <span class="">{q.artists}</span>
                     </div>
                 </div>
             {/each}
