@@ -1,11 +1,6 @@
-# this file has all OpenWeatherMap API integrations in it.
 import logging
-import math
 from datetime import datetime
-from typing import Tuple, List
-
 import requests
-from PIL import Image
 
 
 def get_current_weather(api_key, location, language, logger):
@@ -19,9 +14,7 @@ def get_current_weather(api_key, location, language, logger):
     :return: A dictionary containing the current weather data.
     """
 
-    ld = location
-
-    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang={language}&lat={ld['coords'][0]}&lon={ld['coords'][1]}&appid={api_key}"
+    url = f"https://api.openweathermap.org/data/2.5/weather?units=metric&lang={language}&lat={location['coords'][0]}&lon={location['coords'][1]}&appid={api_key}"
     response = requests.get(url)
 
     if response.status_code == 200:  # yippee! it works :3
@@ -31,10 +24,10 @@ def get_current_weather(api_key, location, language, logger):
             "error": "",
             "data": {
                 "location": {
-                    "latitude": ld['coords'][0],
-                    "longitude": ld['coords'][1],
-                    "name": ld['data'][0]['name'],
-                    "country_code": ld['data'][0]['country'].upper()
+                    "latitude": location['coords'][0],
+                    "longitude": location['coords'][1],
+                    "name": location['data'][0]['name'],
+                    "country_code": location['data'][0]['country'].upper()
                 },
                 "day": datetime.now().strftime("%A"),
                 "time": datetime.now().strftime("%I:%M"),
@@ -200,79 +193,4 @@ def get_current_air_quality(api_key, location, logger):
             "data": {}
 
         }
-
-
-# def get_tile_img(api_key, location, logger):
-#     xtile, ytile = deg_to_tile(lat_deg=location['coords'][0], lon_deg=location['coords'][1], zoom=2)
-#     tileurl = tile_url(x=xtile, y=ytile, z=9, api_key=api_key)
-#     print(tileurl)
-#     tile = download_tile(tileurl)
-#     return tile
-
-
-
-def deg_to_tile(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[int, int]:
-    """
-    Convert latitude/longitude to tile x,y at a given zoom level.
-    Formula from the OpenStreetMap wiki.
-    """
-    lat_rad = math.radians(lat_deg)
-    n = 2.0 ** zoom
-    xtile = int((lon_deg + 180.0) / 360.0 * n)
-    ytile = int(
-        (1.0 - math.log(math.tan(lat_rad) + 1 / math.cos(lat_rad)) / math.pi) /
-        2.0 * n
-    )
-    return xtile, ytile
-
-
-def tile_url(z: int, x: int, y: int, api_key) -> str:
-    """Return the URL for a single satellite tile."""
-    return f"https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid={api_key}"
-
-
-def download_tile(url: str) -> Image.Image:
-    """Download one tile and return it as a PIL image."""
-    r = requests.get(url, timeout=10)
-    r.raise_for_status()
-    return Image.open(r.content)
-
-
-def tiles_in_bbox(bbox: Tuple[float, float, float, float], zoom: int) -> List[Tuple[int, int]]:
-    min_lon, min_lat, max_lon, max_lat = bbox
-
-    # Convert corners to tile indices
-    x_min, y_max = deg_to_tile(min_lat, min_lon, zoom)
-    x_max, y_min = deg_to_tile(max_lat, max_lon, zoom)
-
-    tiles = []
-    for x in range(x_min, x_max + 1):
-        for y in range(y_min, y_max + 1):
-            tiles.append((x, y))
-    return tiles
-
-
-def fetch_and_stitch(bbox: Tuple[float, float, float, float], zoom: int) -> Image.Image:
-    tile_coords = tiles_in_bbox(bbox, zoom)
-
-    # Determine size of final image
-    width_tiles = max(x for x, _ in tile_coords) - min(x for x, _ in tile_coords) + 1
-    height_tiles = max(y for _, y in tile_coords) - min(y for _, y in tile_coords) + 1
-
-    final_img = Image.new("RGB", (width_tiles * 256, height_tiles * 256))
-
-    for idx, (x, y) in enumerate(tile_coords):
-        url = tile_url(zoom, x, y)
-        try:
-            tile_img = download_tile(url)
-        except Exception as e:
-            print(f"Failed to fetch {url}: {e}")
-            continue
-
-        # Paste into final image
-        px = (x - min(x for x, _ in tile_coords)) * 256
-        py = (y - min(y for _, y in tile_coords)) * 256
-        final_img.paste(tile_img, (px, py))
-
-    return final_img
 
