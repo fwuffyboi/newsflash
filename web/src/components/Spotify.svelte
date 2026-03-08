@@ -40,7 +40,6 @@
                     <span>{devicename}</span>
                 </div>
 
-
             </div>
 
             <span class="font-light text-gray-300 italic tracking-tight animate-pulse mt-auto">{m.spotify_now_playing()}</span>
@@ -50,7 +49,7 @@
             <span class="text-2xl text-white font-thin overflow-ellipsis line-clamp-2">{songArtists}</span>
 
         </div>
-        <img class="h-full w-auto aspect-square rounded-lg" alt="The album cover for the album {albumName}" src={albumImg} id="aac" crossOrigin="anonymous" />
+        <img class="h-full w-auto aspect-square mask-y-from-95% mask-x-from-95%" alt="The cover image for the album '{albumName}' by '{songArtists}'." src={albumImg} id="aac" crossOrigin="anonymous" />
 
 <!--        Queue -->
         <div class="flex flex-col w-50 rounded-md text-white">
@@ -58,9 +57,9 @@
             <hr class="">
 
             {#each queue as q}
-                <div class="flex flex-row gap-1 px-1 truncate">
+                <div class="flex flex-row gap-1 px-1 truncate mask-x-from-90%">
                     <div class="max-w-10 pt-2 aspect-square">
-                        <img class="rounded-sm" src={q.cover} alt="">
+                        <img class="mask-y-from-90% mask-x-from-90% rounded-sm" src={q.cover} alt="">
                     </div>
                     <div class="pt-0.5 flex flex-col truncate">
                         <span class="font-semibold">{q.track_name}</span>
