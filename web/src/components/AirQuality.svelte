@@ -41,7 +41,7 @@
 
 </script>
 
-<section class="{bg_gradient} bg-linear-150 min-w-10 max-w-65 w-fit h-10 rounded-lg text-white">
+<section class="{bg_gradient} -bg-linear-120 min-w-10 max-w-65 w-fit h-10 rounded-lg text-white">
 
     <div class="flex flex-row rounded-lg p-1 gap-1.5">
         <span class="font-bold pt-1 pl-1 font-4xl">{message}</span>
