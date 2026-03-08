@@ -9,18 +9,17 @@ import CurrentWeather from "../components/CurrentWeather.svelte";
 import WeatherAlertUkMetOfficeUkMetOffice from "../components/WeatherAlertUkMetOffice.svelte";
 import TFLTrainStatuses from "../components/TFLTrainStatuses.svelte";
 import ICalendar from "../components/ICalendar.svelte";
-import {getLocale} from "$lib/paraglide/runtime";
 import FaceInfoWidget from "../components/FaceInfoWidget.svelte";
 import SimpleHello from "../components/SimpleHello.svelte";
 
 let videoEl!: HTMLVideoElement;
 let canvasEl!: HTMLCanvasElement;
-let CameraStatus = $state("Connecting..."); // todo: translate
+let CameraStatus = $state("Connecting...");
 let CameraResult = $state("...");
 let CameraFaces = $state(0);
 const CAMERA_CAPTURE_INTERVAL_MS = 3000;
 
-let time: string = $state('LOADING...'); // todo: translate
+let time: string = $state('LOADING...');
 
 const ACTIVITY_TIMEOUT = 9
 let activity = $state(false);
