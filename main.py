@@ -418,7 +418,7 @@ if __name__ == "__main__":
             # print(result)
             if result["error"] != "":
                 return {"error": result["error"]}
-            return {'faces': 1, 'error': ''} # TEST/TODO
+            return {'faces': 1, 'error': ''} # TODO: DEV ONLY
         except Exception as e:
             return {"error": str(e)}
 
